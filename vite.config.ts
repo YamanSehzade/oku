@@ -5,6 +5,10 @@ import autoprefixer from 'autoprefixer';
 
 export default defineConfig({
   plugins: [react()],
+  server: {
+    host: true, // Tüm ağ arayüzlerinde dinle
+    port: 5173, // Varsayılan port
+  },
   css: {
     postcss: {
       plugins: [
