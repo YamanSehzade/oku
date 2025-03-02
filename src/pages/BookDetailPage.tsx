@@ -181,11 +181,11 @@ const BookDetailPage = () => {
 
         {/* Kenar Kontrolleri */}
         <div 
-          className={`absolute left-0 inset-y-0 w-1/4 ${showControls ? 'pointer-events-none' : 'cursor-pointer'}`}
+          className="absolute left-0 inset-y-0 w-1/4 cursor-pointer"
           onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
         />
         <div 
-          className={`absolute right-0 inset-y-0 w-1/4 ${showControls ? 'pointer-events-none' : 'cursor-pointer'}`}
+          className="absolute right-0 inset-y-0 w-1/4 cursor-pointer"
           onClick={() => !imageError && handlePageChange(currentPage + 1)}
         />
       </div>
