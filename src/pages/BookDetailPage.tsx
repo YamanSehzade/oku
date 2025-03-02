@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { books } from '../utils/books';
 
@@ -11,6 +11,50 @@ const BookDetailPage = () => {
   const [imageError, setImageError] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showControls, setShowControls] = useState(true);
+  const [showSwipeHint, setShowSwipeHint] = useState(false);
+
+  // Touch kontrolü için state'ler
+  const touchStartX = useRef<number>(0);
+  const touchEndX = useRef<number>(0);
+  const isSwiping = useRef<boolean>(false);
+  const swipeThreshold = 50; // minimum kaydırma mesafesi
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    isSwiping.current = true;
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isSwiping.current) return;
+    touchEndX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = () => {
+    if (!isSwiping.current) return;
+    
+    const swipeDistance = touchStartX.current - touchEndX.current;
+    const isSignificantSwipe = Math.abs(swipeDistance) > swipeThreshold;
+
+    if (isSignificantSwipe) {
+      if (swipeDistance > 0 && !imageError) {
+        // Sola kaydırma - sonraki sayfa
+        handlePageChange(currentPage + 1);
+      } else if (swipeDistance < 0 && currentPage > 1) {
+        // Sağa kaydırma - önceki sayfa
+        handlePageChange(currentPage - 1);
+      } else {
+        // Kaydırma geçersiz, kontrolleri göster/gizle
+        setShowControls(!showControls);
+      }
+    } else {
+      // Küçük dokunuş, kontrolleri göster/gizle
+      setShowControls(!showControls);
+    }
+
+    isSwiping.current = false;
+    touchStartX.current = 0;
+    touchEndX.current = 0;
+  };
 
   // Kontrolleri otomatik gizle
   useEffect(() => {
@@ -38,6 +82,21 @@ const BookDetailPage = () => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [currentPage, imageError, isFullscreen]);
+
+  useEffect(() => {
+    const hasSeenSwipeHint = localStorage.getItem('hasSeenSwipeHint');
+    if (!hasSeenSwipeHint && isFullscreen) {
+      setShowSwipeHint(true);
+      localStorage.setItem('hasSeenSwipeHint', 'true');
+      
+      // 5 saniye sonra ipucu mesajını gizle
+      const timeout = setTimeout(() => {
+        setShowSwipeHint(false);
+      }, 5000);
+      
+      return () => clearTimeout(timeout);
+    }
+  }, [isFullscreen]);
 
   if (!book) {
     return (
@@ -110,6 +169,9 @@ const BookDetailPage = () => {
             <div 
               className="relative aspect-[3/4] rounded-2xl overflow-hidden shadow-xl bg-gray-900 cursor-pointer"
               onClick={() => setIsFullscreen(true)}
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
             >
               <img
                 src={`${book.link}/${currentPage}.jpg`}
@@ -186,6 +248,9 @@ const BookDetailPage = () => {
         <div 
           className="h-full w-full flex flex-col"
           onClick={handleScreenTap}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
         >
           {/* Üst Bar */}
           <div 
@@ -212,13 +277,14 @@ const BookDetailPage = () => {
             <img
               src={`${book.link}/${currentPage}.jpg`}
               alt={`${book.name} - Sayfa ${currentPage}`}
-              className="max-h-full max-w-full object-contain"
+              className="max-h-full max-w-full object-contain select-none touch-none"
               onError={() => {
                 setImageError(true);
                 if (currentPage > 1) {
                   setCurrentPage(currentPage - 1);
                 }
               }}
+              draggable={false}
             />
           </div>
 
@@ -265,10 +331,32 @@ const BookDetailPage = () => {
               if (!imageError) handlePageChange(currentPage + 1);
             }}
           />
+
+          {/* Kaydırma İpucu - Sadece ilk görüntülemede göster */}
+          <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+            <div className={`bg-black/50 backdrop-blur-sm px-6 py-3 rounded-full text-white/90 flex items-center gap-3 transition-opacity duration-300 ${
+              showControls && showSwipeHint ? 'opacity-100' : 'opacity-0'
+            }`}>
+              <svg className="w-6 h-6 animate-[swipe_2s_ease-in-out_infinite]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+              <span>Sayfaları kaydırarak değiştirebilirsiniz</span>
+            </div>
+          </div>
         </div>
       )}
     </div>
   );
 };
+
+// Kaydırma animasyonu için özel stil
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes swipe {
+    0%, 100% { transform: translateX(0); opacity: 0.5; }
+    50% { transform: translateX(10px); opacity: 1; }
+  }
+`;
+document.head.appendChild(style);
 
 export default BookDetailPage; 
