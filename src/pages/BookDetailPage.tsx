@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { books } from '../utils/books';
 
 const BookDetailPage = () => {
@@ -12,6 +13,8 @@ const BookDetailPage = () => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showControls, setShowControls] = useState(true);
   const [showSwipeHint, setShowSwipeHint] = useState(false);
+  const [isPageChanging, setIsPageChanging] = useState(false);
+  const [direction, setDirection] = useState(0); // -1: geri, 1: ileri
 
   // Touch kontrolü için state'ler
   const touchStartX = useRef<number>(0);
@@ -114,6 +117,8 @@ const BookDetailPage = () => {
 
   const handlePageChange = (newPage: number) => {
     if (newPage > 0) {
+      const newDirection = newPage > currentPage ? 1 : -1;
+      setDirection(newDirection);
       setCurrentPage(newPage);
       setImageError(false);
       if (isFullscreen) {
@@ -132,6 +137,24 @@ const BookDetailPage = () => {
     if (isFullscreen) {
       setShowControls(!showControls);
     }
+  };
+
+  // Sayfa geçiş varyantları
+  const variants = {
+    enter: (direction: number) => ({
+      x: direction > 0 ? 1000 : -1000,
+      opacity: 0
+    }),
+    center: {
+      zIndex: 1,
+      x: 0,
+      opacity: 1
+    },
+    exit: (direction: number) => ({
+      zIndex: 0,
+      x: direction < 0 ? 1000 : -1000,
+      opacity: 0
+    })
   };
 
   return (
@@ -173,17 +196,33 @@ const BookDetailPage = () => {
               onTouchMove={handleTouchMove}
               onTouchEnd={handleTouchEnd}
             >
-              <img
-                src={`${book.link}/${currentPage}.jpg`}
-                alt={`${book.name} - Sayfa ${currentPage}`}
-                className="w-full h-full object-contain"
-                onError={() => {
-                  setImageError(true);
-                  if (currentPage > 1) {
-                    setCurrentPage(currentPage - 1);
-                  }
-                }}
-              />
+              <AnimatePresence initial={false} mode="popLayout">
+                <motion.div
+                  key={currentPage}
+                  custom={direction}
+                  variants={variants}
+                  initial="enter"
+                  animate="center"
+                  exit="exit"
+                  transition={{
+                    x: { type: "spring", stiffness: 300, damping: 30 },
+                    opacity: { duration: 0.2 }
+                  }}
+                  className="absolute inset-0 flex items-center justify-center"
+                >
+                  <img
+                    src={`${book.link}/${currentPage}.jpg`}
+                    alt={`${book.name} - Sayfa ${currentPage}`}
+                    className="w-full h-full object-contain"
+                    onError={() => {
+                      setImageError(true);
+                      if (currentPage > 1) {
+                        setCurrentPage(currentPage - 1);
+                      }
+                    }}
+                  />
+                </motion.div>
+              </AnimatePresence>
 
               {/* Sayfa Değiştirme Kontrolleri */}
               <div 
@@ -273,19 +312,35 @@ const BookDetailPage = () => {
           </div>
 
           {/* Kitap Sayfası */}
-          <div className="flex-1 flex items-center justify-center bg-black">
-            <img
-              src={`${book.link}/${currentPage}.jpg`}
-              alt={`${book.name} - Sayfa ${currentPage}`}
-              className="max-h-full max-w-full object-contain select-none touch-none"
-              onError={() => {
-                setImageError(true);
-                if (currentPage > 1) {
-                  setCurrentPage(currentPage - 1);
-                }
-              }}
-              draggable={false}
-            />
+          <div className="flex-1 flex items-center justify-center bg-black overflow-hidden">
+            <AnimatePresence initial={false} mode="popLayout">
+              <motion.div
+                key={currentPage}
+                custom={direction}
+                variants={variants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{
+                  x: { type: "spring", stiffness: 300, damping: 30 },
+                  opacity: { duration: 0.2 }
+                }}
+                className="absolute w-full h-full flex items-center justify-center"
+              >
+                <img
+                  src={`${book.link}/${currentPage}.jpg`}
+                  alt={`${book.name} - Sayfa ${currentPage}`}
+                  className="max-h-full max-w-full object-contain select-none touch-none"
+                  onError={() => {
+                    setImageError(true);
+                    if (currentPage > 1) {
+                      setCurrentPage(currentPage - 1);
+                    }
+                  }}
+                  draggable={false}
+                />
+              </motion.div>
+            </AnimatePresence>
           </div>
 
           {/* Alt Kontroller */}
@@ -349,7 +404,7 @@ const BookDetailPage = () => {
   );
 };
 
-// Kaydırma animasyonu için özel stil
+// Kaydırma ve sayfa geçiş animasyonları için özel stil
 const style = document.createElement('style');
 style.textContent = `
   @keyframes swipe {
