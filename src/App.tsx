@@ -7,8 +7,10 @@ function App() {
   return (
     <BrowserRouter>
       <FavoritesProvider>
-        <h1 className="text-3xl font-semibold text-gray-800">Kitaplarımız</h1>
-        <LibraryPage />
+          
+          <div className="container mx-auto">
+            <LibraryPage />
+          </div>
       </FavoritesProvider>
     </BrowserRouter>
   );
