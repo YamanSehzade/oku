@@ -140,44 +140,41 @@ const BookDetailPage = () => {
           )}
         </div>
 
-        {/* Minimal Kontroller */}
+        {/* Üst Kontroller */}
         <div 
-          className={`absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-black/70 to-transparent transition-opacity duration-300 ${
+          className={`absolute inset-x-0 top-0 p-4 bg-gradient-to-b from-black/70 to-transparent transition-opacity duration-300 ${
             showControls ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
           }`}
         >
-          <div className="flex flex-col gap-4">
-            {/* Sayfa Kontrolleri */}
-            <div className="flex justify-center gap-8">
+          <div className="flex justify-between items-center text-white">
+            <button
+              onClick={() => navigate("/")}
+              className="text-sm font-medium hover:opacity-100 transition-opacity z-50 bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg backdrop-blur-sm"
+            >
+              Ana Sayfa
+            </button>
+            <div className="flex items-center gap-8">
               <button
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
-                className="p-4 rounded-full bg-white/10 text-white backdrop-blur-sm disabled:opacity-30 disabled:cursor-not-allowed hover:bg-white/20 transition-colors z-50"
+                className="p-2 rounded-lg bg-white/10 text-white backdrop-blur-sm disabled:opacity-30 disabled:cursor-not-allowed hover:bg-white/20 transition-colors z-50"
               >
-                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
               </button>
+              <span className="text-sm font-medium bg-white/10 px-4 py-2 rounded-lg backdrop-blur-sm">
+                Sayfa {currentPage}
+              </span>
               <button
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={imageError}
-                className="p-4 rounded-full bg-white/10 text-white backdrop-blur-sm disabled:opacity-30 disabled:cursor-not-allowed hover:bg-white/20 transition-colors z-50"
+                className="p-2 rounded-lg bg-white/10 text-white backdrop-blur-sm disabled:opacity-30 disabled:cursor-not-allowed hover:bg-white/20 transition-colors z-50"
               >
-                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </button>
-            </div>
-
-            {/* Alt Bilgi */}
-            <div className="flex justify-between items-center text-white">
-              <button
-                onClick={() => navigate("/")}
-                className="text-sm opacity-70 hover:opacity-100 transition-opacity z-50"
-              >
-                Ana Sayfa
-              </button>
-              <span className="text-sm opacity-70">Sayfa {currentPage}</span>
             </div>
           </div>
         </div>
