@@ -107,7 +107,10 @@ const BookDetailPage = () => {
             </div>
 
             {/* Kitap Görüntüleyici */}
-            <div className="relative aspect-[3/4] rounded-2xl overflow-hidden shadow-xl bg-gray-900">
+            <div 
+              className="relative aspect-[3/4] rounded-2xl overflow-hidden shadow-xl bg-gray-900 cursor-pointer"
+              onClick={() => setIsFullscreen(true)}
+            >
               <img
                 src={`${book.link}/${currentPage}.jpg`}
                 alt={`${book.name} - Sayfa ${currentPage}`}
@@ -121,9 +124,15 @@ const BookDetailPage = () => {
               />
 
               {/* Sayfa Değiştirme Kontrolleri */}
-              <div className="absolute inset-x-0 bottom-0 p-4 flex justify-between">
+              <div 
+                className="absolute inset-x-0 bottom-0 p-4 flex justify-between"
+                onClick={(e) => e.stopPropagation()} // Butonlara tıklandığında tam ekrana geçmeyi engelle
+              >
                 <button
-                  onClick={() => handlePageChange(currentPage - 1)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handlePageChange(currentPage - 1);
+                  }}
                   disabled={currentPage === 1}
                   className="p-3 rounded-full bg-black/50 text-white backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-black/70 transition-colors"
                 >
@@ -132,7 +141,10 @@ const BookDetailPage = () => {
                   </svg>
                 </button>
                 <button
-                  onClick={() => handlePageChange(currentPage + 1)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handlePageChange(currentPage + 1);
+                  }}
                   disabled={imageError}
                   className="p-3 rounded-full bg-black/50 text-white backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-black/70 transition-colors"
                 >
@@ -140,6 +152,14 @@ const BookDetailPage = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                 </button>
+              </div>
+
+              {/* Tam Ekran İpucu */}
+              <div className="absolute top-4 right-4 text-white/70 flex items-center gap-2 bg-black/30 px-3 py-1.5 rounded-full backdrop-blur-sm text-sm">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-9v4m0-4h-4m4 4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 9v-4m0 4h-4m4-4l-5-5" />
+                </svg>
+                <span>Tam ekran için dokun</span>
               </div>
             </div>
 
