@@ -39,11 +39,6 @@ const BookCard: React.FC<Props> = ({ book, index }) => {
       {/* Karartma Katmanı */}
       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-300" />
 
-      {/* Sayfa Sayısı */}
-      <div className="absolute top-3 left-3 z-10 px-2 py-1 rounded-lg bg-black/40 backdrop-blur-sm text-white text-sm font-medium">
-        {book.pageCount || '?'} sayfa
-      </div>
-
       {/* Favori Butonu */}
       <button
         onClick={(e) => {
