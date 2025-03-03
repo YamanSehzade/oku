@@ -1,5 +1,5 @@
 import { motion, PanInfo, useAnimation } from 'framer-motion';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { BiArrowBack } from 'react-icons/bi';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useLastRead } from '../context/LastReadContext';
@@ -12,13 +12,15 @@ const BookDetailPage = () => {
   const { getLastRead, saveLastRead } = useLastRead();
 
   // URL'den gelen id'yi decode et ve kitabı bul
-  const decodedId = id ? decodeURIComponent(id) : '';
-  const book = books.find(b => {
-    // URL'den gelen id, kitabın link'inin son kısmı olacak
-    const urlParts = b.link.split('/');
-    const bookId = urlParts[urlParts.length - 1];
-    return bookId === decodedId;
-  });
+  const decodedId = useMemo(() => (id ? decodeURIComponent(id) : ''), [id]);
+
+  const book = useMemo(() => {
+    return books.find(b => {
+      const urlParts = b.link.split('/');
+      const bookId = urlParts[urlParts.length - 1];
+      return bookId === decodedId;
+    });
+  }, [decodedId]);
 
   // Kitabın son okunan sayfasını al veya 1'den başla
   const [currentPage, setCurrentPage] = useState(() => {
@@ -30,6 +32,24 @@ const BookDetailPage = () => {
   const [showControls, setShowControls] = useState(true);
   const controls = useAnimation();
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Kontrol sınıfları
+  const controlsClassName = useMemo(() => {
+    return `fixed inset-x-0 z-50 transition-opacity duration-300 ${
+      showControls ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'
+    }`;
+  }, [showControls]);
+
+  // Buton sınıfları
+  const buttonClassName = useMemo(() => {
+    return 'rounded-lg bg-white/10 p-2 text-white backdrop-blur-sm transition-colors hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-30';
+  }, []);
+
+  // Görsel URL'si
+  const imageUrl = useMemo(() => {
+    if (!book) return '';
+    return `${book.link}/${currentPage}.jpg`;
+  }, [book, currentPage]);
 
   // Sayfa değiştiğinde otomatik kaydet
   useEffect(() => {
@@ -56,66 +76,77 @@ const BookDetailPage = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [currentPage, imageError]);
 
-  const handleGoBack = () => {
-    // Önceki sayfanın URL'sini kontrol et
+  const handleGoBack = useCallback(() => {
     const previousPath = location.state?.from || '/';
     navigate(previousPath);
-  };
+  }, [location.state, navigate]);
 
-  const scrollToTop = () => {
+  const scrollToTop = useCallback(() => {
     if (containerRef.current) {
       containerRef.current.scrollTo({ top: 0, behavior: 'instant' });
     }
-  };
+  }, []);
 
-  const handleDragEnd = async (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-    const threshold = 100;
-    const velocity = 500;
+  const animatePageChange = useCallback(
+    async (direction: 'next' | 'prev') => {
+      const xOffset = direction === 'next' ? -window.innerWidth : window.innerWidth;
+      await controls.start({ x: xOffset, transition: { duration: 0.2 } });
+      setCurrentPage(prev => (direction === 'next' ? prev + 1 : prev - 1));
+      setImageError(false);
+      scrollToTop();
+      await controls.set({ x: -xOffset });
+      await controls.start({ x: 0, transition: { duration: 0.2 } });
+    },
+    [controls, scrollToTop]
+  );
 
-    if (info.velocity.x < -velocity && !imageError) {
-      await animatePageChange('next');
-    } else if (info.velocity.x > velocity && currentPage > 1) {
-      await animatePageChange('prev');
-    } else if (info.offset.x < -threshold && !imageError) {
-      await animatePageChange('next');
-    } else if (info.offset.x > threshold && currentPage > 1) {
-      await animatePageChange('prev');
-    } else {
-      controls.start({ x: 0, transition: { duration: 0.2 } });
-    }
-  };
-
-  const animatePageChange = async (direction: 'next' | 'prev') => {
-    const xOffset = direction === 'next' ? -window.innerWidth : window.innerWidth;
-    await controls.start({ x: xOffset, transition: { duration: 0.2 } });
-    setCurrentPage(prev => (direction === 'next' ? prev + 1 : prev - 1));
-    setImageError(false);
-    scrollToTop();
-    await controls.set({ x: -xOffset });
-    await controls.start({ x: 0, transition: { duration: 0.2 } });
-  };
-
-  const handlePageChange = async (newPage: number) => {
-    if (newPage > 0) {
-      if (newPage > currentPage && !imageError) {
-        await animatePageChange('next');
-      } else if (newPage < currentPage) {
-        await animatePageChange('prev');
+  const handlePageChange = useCallback(
+    async (newPage: number) => {
+      if (newPage > 0) {
+        if (newPage > currentPage && !imageError) {
+          await animatePageChange('next');
+        } else if (newPage < currentPage) {
+          await animatePageChange('prev');
+        }
       }
-    }
-  };
+    },
+    [currentPage, imageError, animatePageChange]
+  );
 
-  const handleScreenTap = (e: React.MouseEvent) => {
-    if (
-      (e.target as HTMLElement).tagName === 'BUTTON' ||
-      (e.target as HTMLElement).closest('button') ||
-      (e.target as HTMLElement).tagName === 'svg' ||
-      (e.target as HTMLElement).tagName === 'path'
-    ) {
-      return;
-    }
-    setShowControls(!showControls);
-  };
+  const handleDragEnd = useCallback(
+    async (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+      const threshold = 100;
+      const velocity = 500;
+
+      if (info.velocity.x < -velocity && !imageError) {
+        await animatePageChange('next');
+      } else if (info.velocity.x > velocity && currentPage > 1) {
+        await animatePageChange('prev');
+      } else if (info.offset.x < -threshold && !imageError) {
+        await animatePageChange('next');
+      } else if (info.offset.x > threshold && currentPage > 1) {
+        await animatePageChange('prev');
+      } else {
+        controls.start({ x: 0, transition: { duration: 0.2 } });
+      }
+    },
+    [animatePageChange, controls, currentPage, imageError]
+  );
+
+  const handleScreenTap = useCallback(
+    (e: React.MouseEvent) => {
+      if (
+        (e.target as HTMLElement).tagName === 'BUTTON' ||
+        (e.target as HTMLElement).closest('button') ||
+        (e.target as HTMLElement).tagName === 'svg' ||
+        (e.target as HTMLElement).tagName === 'path'
+      ) {
+        return;
+      }
+      setShowControls(!showControls);
+    },
+    [showControls]
+  );
 
   if (!book) {
     return (
@@ -137,9 +168,7 @@ const BookDetailPage = () => {
     <div className="fixed inset-0 bg-black">
       {/* Üst Bar */}
       <div
-        className={`fixed inset-x-0 top-0 z-50 bg-gradient-to-b from-black/70 to-transparent px-4 py-2 transition-opacity duration-300 ${
-          showControls ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'
-        }`}
+        className={`${controlsClassName} top-0 bg-gradient-to-b from-black/70 to-transparent px-4 py-2`}
       >
         <div className="flex items-center justify-between text-white">
           <button
@@ -186,7 +215,7 @@ const BookDetailPage = () => {
               </div>
             ) : (
               <img
-                src={`${book.link}/${currentPage}.jpg`}
+                src={imageUrl}
                 alt={`${book.name} - Sayfa ${currentPage}`}
                 className="min-h-full w-full select-none object-contain landscape:object-cover"
                 onError={() => {
@@ -234,9 +263,7 @@ const BookDetailPage = () => {
 
       {/* Alt Kontroller - motion.div dışına taşındı */}
       <div
-        className={`fixed inset-x-0 bottom-0 z-50 m-4 rounded-xl bg-gradient-to-b from-black/70 to-transparent px-4 py-2 transition-opacity duration-300 ${
-          showControls ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'
-        }`}
+        className={`${controlsClassName} bottom-0 m-4 rounded-xl bg-gradient-to-b from-black/70 to-transparent px-4 py-2`}
       >
         <div className="flex items-center justify-between text-white">
           <div className="text-sm">
@@ -247,7 +274,7 @@ const BookDetailPage = () => {
             <button
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
-              className="rounded-lg bg-white/10 p-2 text-white backdrop-blur-sm transition-colors hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-30"
+              className={buttonClassName}
             >
               <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
@@ -264,7 +291,7 @@ const BookDetailPage = () => {
             <button
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={imageError}
-              className="rounded-lg bg-white/10 p-2 text-white backdrop-blur-sm transition-colors hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-30"
+              className={buttonClassName}
             >
               <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
