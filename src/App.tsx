@@ -31,7 +31,7 @@ const AppContent = () => {
   }, [location.pathname]);
 
   return (
-    <div className="min-h-screen bg-primary-50">
+    <div className="font-body min-h-screen bg-primary-50">
       <Header
         activeTab={activeTab}
         setActiveTab={setActiveTab}

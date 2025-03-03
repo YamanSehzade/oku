@@ -48,7 +48,7 @@ const Header = ({ activeTab, setActiveTab, isMenuOpen, setIsMenuOpen }: Props) =
               alt="Oku Logo"
               className="mr-3 h-10 w-10 sm:h-12 sm:w-12"
             />
-            <h1 className="text-2xl font-bold text-secondary-600 sm:text-3xl">Oku</h1>
+            <h1 className="font-display text-2xl font-bold text-secondary-600 sm:text-3xl">Oku</h1>
           </div>
 
           {/* Mobil Menü Butonu */}
