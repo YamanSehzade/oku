@@ -8,6 +8,7 @@ import {
   BiGitBranch,
   BiHistory,
   BiInfoCircle,
+  BiLineChart,
 } from 'react-icons/bi';
 
 const AboutPage = () => {
@@ -169,6 +170,35 @@ const AboutPage = () => {
                   </span>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Gizlilik ve Analytics */}
+      <section className="space-y-4 rounded-lg bg-white p-6 shadow-md">
+        <h3 className="flex items-center text-lg font-semibold text-gray-900">
+          <BiLineChart className="mr-2 h-5 w-5 text-gray-700" />
+          Gizlilik ve Analytics
+        </h3>
+        <div className="rounded-lg bg-gray-50 p-4">
+          <div className="space-y-4">
+            <div>
+              <h4 className="font-medium">Firebase Analytics</h4>
+              <p className="mt-1 text-sm text-gray-600">
+                Uygulamamızı geliştirmek ve size daha iyi bir deneyim sunmak için Firebase Analytics
+                kullanıyoruz. Bu araç sayesinde:
+              </p>
+              <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-gray-600">
+                <li>Kullanıcı deneyimini iyileştirme</li>
+                <li>Uygulama performansını izleme</li>
+                <li>Hata tespiti ve çözümü</li>
+                <li>Kullanım istatistiklerini analiz etme</li>
+              </ul>
+              <p className="mt-3 text-sm text-gray-600">
+                Toplanan veriler anonim olarak işlenir ve sadece uygulama geliştirme amacıyla
+                kullanılır.
+              </p>
             </div>
           </div>
         </div>
