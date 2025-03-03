@@ -23,7 +23,7 @@ const BookDetailPage = () => {
   // Kitabın son okunan sayfasını al veya 1'den başla
   const [currentPage, setCurrentPage] = useState(() => {
     if (!book) return 1;
-    return getLastRead(book) || 1;
+    return getLastRead(book) || 2;
   });
 
   const [imageError, setImageError] = useState(false);
