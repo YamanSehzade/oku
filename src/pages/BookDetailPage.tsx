@@ -45,11 +45,35 @@ const BookDetailPage = () => {
     return 'rounded-lg bg-white/10 p-2 text-white backdrop-blur-sm transition-colors hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-30';
   }, []);
 
-  // Görsel URL'si
-  const imageUrl = useMemo(() => {
-    if (!book) return '';
-    return `${book.link}/${currentPage}.jpg`;
+  // Görsel önbelleğe alma için ref
+  const imageCache = useRef<Set<string>>(new Set());
+
+  // Görsel URL'lerini oluştur ve önbelleğe al
+  const { currentImageUrl, nextImageUrl, prevImageUrl } = useMemo(() => {
+    if (!book) return { currentImageUrl: '', nextImageUrl: '', prevImageUrl: '' };
+
+    const current = `${book.link}/${currentPage}.jpg`;
+    const next = `${book.link}/${currentPage + 1}.jpg`;
+    const prev = currentPage > 1 ? `${book.link}/${currentPage - 1}.jpg` : '';
+
+    return { currentImageUrl: current, nextImageUrl: next, prevImageUrl: prev };
   }, [book, currentPage]);
+
+  // Görselleri önceden yükle
+  useEffect(() => {
+    if (!book || imageError) return;
+
+    const preloadImage = (url: string) => {
+      if (!url || imageCache.current.has(url)) return;
+
+      const img = new Image();
+      img.src = url;
+      imageCache.current.add(url);
+    };
+
+    preloadImage(nextImageUrl);
+    preloadImage(prevImageUrl);
+  }, [book, currentPage, nextImageUrl, prevImageUrl, imageError]);
 
   // Sayfa değiştiğinde otomatik kaydet
   useEffect(() => {
@@ -215,7 +239,7 @@ const BookDetailPage = () => {
               </div>
             ) : (
               <img
-                src={imageUrl}
+                src={currentImageUrl}
                 alt={`${book.name} - Sayfa ${currentPage}`}
                 className="min-h-full w-full select-none object-contain landscape:object-cover"
                 onError={() => {
@@ -305,6 +329,14 @@ const BookDetailPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Görünmez preload görselleri */}
+      {!imageError && (
+        <div className="hidden">
+          <img src={nextImageUrl} alt="next" />
+          {prevImageUrl && <img src={prevImageUrl} alt="prev" />}
+        </div>
+      )}
     </div>
   );
 };
