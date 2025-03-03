@@ -18,14 +18,36 @@ const BookCard: React.FC<Props> = ({ book, lastReadPage }) => {
 
   // Kitap başlığını düzenle
   const getFormattedTitle = () => {
-    if (book.series && book.name.includes(book.series)) {
-      // Seri adını başlıktan çıkar ve kalan metni temizle
-      return book.name
+    let title = book.name;
+
+    // Yaş bilgisini kontrol et ve formatla
+    const ageMatch = title.match(/(\d+)\s*[Yy]aş/);
+    if (ageMatch) {
+      const age = ageMatch[1];
+      if (title.toLowerCase().includes('üzeri')) {
+        return `${age}+ Yaş`;
+      }
+      if (title === 'Yaş' || title === 'Yaş ve Üzeri') {
+        return `${age}+ Yaş`;
+      }
+      return `${age} Yaş`;
+    }
+
+    // Eğer seri adı varsa ve başlık seri adını içeriyorsa
+    if (book.series && title.includes(book.series)) {
+      // Seri adını başlıktan çıkar
+      title = title
         .replace(book.series, '')
         .replace(/^[-\s]*/, '') // Baştaki tire ve boşlukları temizle
         .replace(/^[0-9]+[-\s]*/, ''); // Baştaki sayı ve tire/boşlukları temizle
     }
-    return book.name;
+
+    // Başlık boş kaldıysa seri adını kullan
+    if (!title.trim() && book.series) {
+      return book.series;
+    }
+
+    return title;
   };
 
   // Kitabın link'inden id'yi çıkar
