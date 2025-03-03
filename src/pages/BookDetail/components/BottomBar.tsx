@@ -1,3 +1,4 @@
+import { BiChevronLeft, BiChevronRight } from 'react-icons/bi';
 import { Book } from '../../../types/book';
 
 interface BottomBarProps {
@@ -19,39 +20,30 @@ export const BottomBar = ({
 }: BottomBarProps) => {
   return (
     <div
-      className={`${controlsClassName} bottom-0 m-4 rounded-xl bg-gradient-to-b from-black/70 to-transparent px-4 py-2`}
+      className={`${controlsClassName} bottom-0 mx-2 mb-4 rounded-2xl bg-black/70 px-3 py-2 backdrop-blur-sm sm:mx-4 sm:px-4`}
     >
-      <div className="flex items-center justify-between text-white">
-        <div className="text-sm">
+      <div className="flex flex-col space-y-2 text-white sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
+        <div className="text-xs sm:text-sm">
           {book.writer && <div className="font-medium">{book.writer}</div>}
           <div className="text-white/70">{book.publisher}</div>
         </div>
-        <div className="flex items-center gap-8">
+        <div className="flex items-center justify-between sm:gap-8">
           <button
             onClick={() => onPageChange(currentPage - 1)}
             disabled={currentPage === 1}
-            className={buttonClassName}
+            className={`${buttonClassName} rounded-xl p-2`}
           >
-            <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
+            <BiChevronLeft className="h-6 w-6" />
           </button>
-          <span className="rounded-lg bg-white/10 px-4 py-2 text-sm font-medium backdrop-blur-sm">
-            Sayfa {currentPage} / {book.pageCount}
+          <span className="rounded-xl bg-white/10 px-4 py-2 text-xs font-medium backdrop-blur-sm sm:text-sm">
+            {currentPage} / {book.pageCount}
           </span>
           <button
             onClick={() => onPageChange(currentPage + 1)}
             disabled={imageError}
-            className={buttonClassName}
+            className={`${buttonClassName} rounded-xl p-2`}
           >
-            <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
+            <BiChevronRight className="h-6 w-6" />
           </button>
         </div>
       </div>
