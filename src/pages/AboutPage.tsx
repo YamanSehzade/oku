@@ -1,3 +1,4 @@
+import useAnalytics from '@/hooks/useAnalytics';
 import {
   BiBook,
   BiBookHeart,
@@ -13,6 +14,10 @@ import {
 
 const AboutPage = () => {
   const currentYear = new Date().getFullYear();
+  const analytics = useAnalytics();
+
+  // Sayfa görüntüleme analizi
+  analytics.usePageView('about');
 
   return (
     <div className="space-y-8">
