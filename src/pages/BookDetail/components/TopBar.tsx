@@ -18,44 +18,66 @@ export const TopBar = ({ book, controlsClassName, onGoBack }: TopBarProps) => {
     printWindow.document.write(`
       <html>
         <head>
+          <title>${book.name}</title>
           <style>
-            @page {
-              size: auto;
-              margin: 0mm;
-            }
-            body {
+            * {
               margin: 0;
               padding: 0;
+              box-sizing: border-box;
+            }
+            @page {
+              size: auto;
+              margin: 10mm;
+            }
+            html, body {
+              height: 100%;
+              width: 100%;
+            }
+            body {
               display: flex;
               justify-content: center;
               align-items: center;
-              min-height: 100vh;
+              min-height: 100%;
+            }
+            .print-container {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              width: 100%;
+              height: 100%;
             }
             img {
-              width: 100vw;
-              height: 100vh;
+              max-width: 100%;
+              max-height: 100%;
               object-fit: contain;
-              page-break-inside: avoid;
+              display: block;
             }
             @media print {
-              body {
-                height: 100vh;
+              html, body {
+                height: 100%;
+                width: 100%;
                 margin: 0;
                 padding: 0;
+              }
+              .print-container {
+                break-inside: avoid;
+                page-break-after: avoid;
+                page-break-before: avoid;
               }
               img {
                 max-width: 100%;
                 max-height: 100%;
-                width: auto;
-                height: auto;
-                margin: auto;
-                display: block;
               }
             }
           </style>
         </head>
         <body>
-          <img src="${currentImage.src}" onload="window.print(); window.close();" />
+          <div class="print-container">
+            <img 
+              src="${currentImage.src}" 
+              onload="setTimeout(() => { window.print(); window.close(); }, 500);" 
+            />
+          </div>
         </body>
       </html>
     `);
