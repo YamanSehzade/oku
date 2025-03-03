@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { BiHeart } from 'react-icons/bi';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useFavorites } from '../context/FavoritesContext';
 import { Book } from '../utils/books';
 
@@ -13,6 +13,7 @@ const BookCard: React.FC<Props> = ({ book }) => {
   const [imageError, setImageError] = useState(false);
   const { isFavorite, addFavorite, removeFavorite } = useFavorites();
   const favorite = isFavorite(book);
+  const location = useLocation();
 
   // Kitabın link'inden id'yi çıkar
   const getBookId = () => {
@@ -32,6 +33,7 @@ const BookCard: React.FC<Props> = ({ book }) => {
   return (
     <Link
       to={`/kitap/${getBookId()}`}
+      state={{ from: location.pathname }}
       className="group relative block aspect-[3/4] overflow-hidden rounded-2xl shadow-lg transition-all duration-300 hover:shadow-2xl"
     >
       {/* Arka Plan Resmi */}

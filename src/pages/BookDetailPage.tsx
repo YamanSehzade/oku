@@ -1,12 +1,15 @@
 import { motion, PanInfo, useAnimation } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
 import { BiArrowBack, BiBookmark } from 'react-icons/bi';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useBookmarks } from '../context/BookmarksContext';
 import { books } from '../utils/books';
 
 const BookDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
+  const { isBookmarked, addBookmark, removeBookmark } = useBookmarks();
 
   // URL'den gelen id'yi decode et ve kitabı bul
   const decodedId = id ? decodeURIComponent(id) : '';
@@ -20,7 +23,6 @@ const BookDetailPage = () => {
   const [currentPage, setCurrentPage] = useState(2);
   const [imageError, setImageError] = useState(false);
   const [showControls, setShowControls] = useState(true);
-  const [isBookmarked, setIsBookmarked] = useState(false); // TODO: Context'ten gelecek
   const controls = useAnimation();
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -37,6 +39,12 @@ const BookDetailPage = () => {
     window.addEventListener('keydown', handleKeyDown, { passive: true });
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [currentPage, imageError]);
+
+  const handleGoBack = () => {
+    // Önceki sayfanın URL'sini kontrol et
+    const previousPath = location.state?.from || '/';
+    navigate(previousPath);
+  };
 
   const scrollToTop = () => {
     if (containerRef.current) {
@@ -94,7 +102,13 @@ const BookDetailPage = () => {
   };
 
   const handleBookmarkClick = () => {
-    setIsBookmarked(!isBookmarked); // TODO: Context'e taşınacak
+    if (!book) return;
+
+    if (isBookmarked(book)) {
+      removeBookmark(book);
+    } else {
+      addBookmark(book, currentPage);
+    }
   };
 
   if (!book) {
@@ -103,10 +117,10 @@ const BookDetailPage = () => {
         <div className="text-center">
           <h2 className="mb-4 text-2xl font-bold text-gray-900">Kitap bulunamadı</h2>
           <button
-            onClick={() => navigate('/')}
+            onClick={handleGoBack}
             className="rounded-lg bg-secondary-600 px-6 py-2 text-white transition-colors hover:bg-secondary-700"
           >
-            Ana Sayfaya Dön
+            Geri Dön
           </button>
         </div>
       </div>
@@ -123,7 +137,7 @@ const BookDetailPage = () => {
       >
         <div className="flex items-center justify-between text-white">
           <button
-            onClick={() => navigate('/')}
+            onClick={handleGoBack}
             className="flex items-center rounded-lg bg-white/10 px-4 py-2 text-sm font-medium backdrop-blur-sm transition-opacity hover:bg-white/20"
           >
             <BiArrowBack className="mr-2 h-5 w-5" />
@@ -134,7 +148,7 @@ const BookDetailPage = () => {
             <button
               onClick={handleBookmarkClick}
               className={`rounded-full p-2 ${
-                isBookmarked
+                isBookmarked(book)
                   ? 'bg-accent-500/20 text-accent-400'
                   : 'bg-white/10 text-white/70 hover:bg-white/20'
               }`}
@@ -167,10 +181,10 @@ const BookDetailPage = () => {
                 <div className="mb-4 text-2xl font-semibold text-white">Kitap Bitti</div>
                 <div className="text-lg text-white/70">Bu kitabı okumayı tamamladınız</div>
                 <button
-                  onClick={() => navigate('/')}
+                  onClick={handleGoBack}
                   className="mt-8 rounded-lg bg-white/10 px-6 py-3 text-white backdrop-blur-sm transition-colors hover:bg-white/20"
                 >
-                  Ana Sayfaya Dön
+                  Geri Dön
                 </button>
               </div>
             ) : (
