@@ -1,6 +1,7 @@
 import {
   BiBook,
   BiBookHeart,
+  BiCopyAlt,
   BiCopyright,
   BiDevices,
   BiDownload,
@@ -29,7 +30,8 @@ const AboutPage = () => {
         </h2>
         <p className="text-sm text-gray-500">
           Kitapseverlerin dijital ortamda kitap okuma deneyimini zenginleştirmek için tasarlanmış
-          bir web uygulaması.
+          bir web uygulaması. Bu çalışma topluma fayda sağlamak amacıyla geliştirilmiş olup,
+          herhangi bir ticari amacı bulunmamaktadır.
         </p>
       </div>
 
@@ -141,6 +143,40 @@ const AboutPage = () => {
               <p className="mt-3 text-sm text-gray-600">
                 Toplanan veriler anonim olarak işlenir ve sadece uygulama geliştirme amacıyla
                 kullanılır.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Telif Hakları */}
+      <section className="space-y-4 rounded-lg bg-white p-6 shadow-md">
+        <h3 className="flex items-center text-lg font-semibold text-gray-900">
+          <BiCopyAlt className="mr-2 h-5 w-5 text-gray-700" />
+          Telif Hakları ve Sorumluluk Reddi
+        </h3>
+        <div className="rounded-lg bg-gray-50 p-4">
+          <div className="space-y-4">
+            <div className="prose prose-sm text-gray-600">
+              <p className="leading-relaxed">
+                Değerli okuyucularımız, Oku uygulaması olarak önemli bir konuda bilgilendirme yapmak
+                isteriz. Uygulamamızda sunulan tüm kitap içerikleri, görseller ve ilgili materyaller
+                doğrudan hizmetsource.com sunucularından sağlanmaktadır. Bu sebeple, tüm telif
+                hakları ve yasal sorumluluklar tamamen hizmetsource.com'a aittir.
+              </p>
+              <p className="mt-4 leading-relaxed">
+                Oku uygulaması, sadece bir arayüz sağlayıcı olarak hizmet vermekte olup, içeriklerle
+                ilgili hiçbir yasal sorumluluk kabul etmemektedir. İçeriklerle ilgili her türlü
+                telif hakkı talebi, şikayet ve bildirimleriniz için doğrudan{' '}
+                <a
+                  href="https://www.hizmetsource.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary-600 hover:text-primary-700"
+                >
+                  hizmetsource.com
+                </a>{' '}
+                ile iletişime geçmenizi önemle rica ederiz.
               </p>
             </div>
           </div>

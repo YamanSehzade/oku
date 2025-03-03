@@ -1,4 +1,4 @@
-const CACHE_NAME = 'oku-cache-v7';
+const CACHE_NAME = 'oku-cache-v8';
 const STATIC_CACHE_URLS = [
   '/',
   '/index.html',
