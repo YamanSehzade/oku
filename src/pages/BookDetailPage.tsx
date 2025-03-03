@@ -137,39 +137,70 @@ const BookDetailPage = () => {
     [currentPage, imageError, animatePageChange]
   );
 
-  const handleDragEnd = useCallback(
-    async (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-      const threshold = 100;
-      const velocity = 500;
+  // Ortak element kontrolü için yardımcı fonksiyon
+  const isClickableElement = useCallback((target: HTMLElement) => {
+    return (
+      target.tagName === 'BUTTON' ||
+      target.closest('button') ||
+      target.tagName === 'svg' ||
+      target.tagName === 'path'
+    );
+  }, []);
 
-      if (info.velocity.x < -velocity && !imageError) {
-        await animatePageChange('next');
-      } else if (info.velocity.x > velocity && currentPage > 1) {
-        await animatePageChange('prev');
-      } else if (info.offset.x < -threshold && !imageError) {
-        await animatePageChange('next');
-      } else if (info.offset.x > threshold && currentPage > 1) {
-        await animatePageChange('prev');
-      } else {
-        controls.start({ x: 0, transition: { duration: 0.2 } });
+  // Kenar kontrolü için yardımcı fonksiyon
+  const handleEdgeControl = useCallback(
+    (direction: 'prev' | 'next', e: React.MouseEvent) => {
+      if (isClickableElement(e.target as HTMLElement)) return;
+
+      // Event'in yayılmasını engelle
+      e.preventDefault();
+      e.stopPropagation();
+
+      if (direction === 'prev' && currentPage > 1) {
+        handlePageChange(currentPage - 1);
+      } else if (direction === 'next' && !imageError) {
+        handlePageChange(currentPage + 1);
       }
     },
-    [animatePageChange, controls, currentPage, imageError]
+    [currentPage, imageError, handlePageChange, isClickableElement]
   );
 
   const handleScreenTap = useCallback(
     (e: React.MouseEvent) => {
-      if (
-        (e.target as HTMLElement).tagName === 'BUTTON' ||
-        (e.target as HTMLElement).closest('button') ||
-        (e.target as HTMLElement).tagName === 'svg' ||
-        (e.target as HTMLElement).tagName === 'path'
-      ) {
-        return;
-      }
+      if (isClickableElement(e.target as HTMLElement)) return;
       setShowControls(!showControls);
     },
-    [showControls]
+    [showControls, isClickableElement]
+  );
+
+  // Gesture kontrolü için sabitler
+  const SWIPE_CONF = {
+    threshold: 100,
+    velocity: 500,
+    dragElastic: 0.2,
+    animationDuration: 0.2,
+  } as const;
+
+  const handleDragEnd = useCallback(
+    async (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+      const { velocity, threshold } = SWIPE_CONF;
+
+      const canGoNext = !imageError;
+      const canGoPrev = currentPage > 1;
+
+      if (info.velocity.x < -velocity && canGoNext) {
+        await animatePageChange('next');
+      } else if (info.velocity.x > velocity && canGoPrev) {
+        await animatePageChange('prev');
+      } else if (info.offset.x < -threshold && canGoNext) {
+        await animatePageChange('next');
+      } else if (info.offset.x > threshold && canGoPrev) {
+        await animatePageChange('prev');
+      } else {
+        controls.start({ x: 0, transition: { duration: SWIPE_CONF.animationDuration } });
+      }
+    },
+    [animatePageChange, controls, currentPage, imageError]
   );
 
   if (!book) {
@@ -214,7 +245,7 @@ const BookDetailPage = () => {
         onClick={handleScreenTap}
         drag="x"
         dragConstraints={{ left: 0, right: 0 }}
-        dragElastic={0.2}
+        dragElastic={SWIPE_CONF.dragElastic}
         onDragEnd={handleDragEnd}
       >
         <div
@@ -257,31 +288,11 @@ const BookDetailPage = () => {
         {/* Kenar Kontrolleri */}
         <div
           className="absolute inset-y-0 left-0 z-10 h-full w-1/6 cursor-pointer"
-          onClick={e => {
-            if (
-              (e.target as HTMLElement).tagName === 'BUTTON' ||
-              (e.target as HTMLElement).closest('button') ||
-              (e.target as HTMLElement).tagName === 'svg' ||
-              (e.target as HTMLElement).tagName === 'path'
-            ) {
-              return;
-            }
-            if (currentPage > 1) handlePageChange(currentPage - 1);
-          }}
+          onClick={e => handleEdgeControl('prev', e)}
         />
         <div
           className="absolute inset-y-0 right-0 z-10 h-full w-1/6 cursor-pointer"
-          onClick={e => {
-            if (
-              (e.target as HTMLElement).tagName === 'BUTTON' ||
-              (e.target as HTMLElement).closest('button') ||
-              (e.target as HTMLElement).tagName === 'svg' ||
-              (e.target as HTMLElement).tagName === 'path'
-            ) {
-              return;
-            }
-            if (!imageError) handlePageChange(currentPage + 1);
-          }}
+          onClick={e => handleEdgeControl('next', e)}
         />
       </motion.div>
 
