@@ -6,15 +6,14 @@ const AboutPage = () => {
   return (
     <div className="space-y-8">
       {/* Başlık */}
-      <div className="rounded-lg border-t-4 border-primary-500 bg-white p-4 shadow sm:rounded-lg sm:border-l-4 sm:border-t-0 sm:p-6">
-        <h2 className="mb-4 flex items-center text-xl font-bold text-gray-900 sm:text-2xl">
-          <BiBook className="mr-2 h-6 w-6 text-primary-500 sm:h-7 sm:w-7" />
-          Oku Uygulaması Hakkında
+      <div className="rounded-lg border-l-2 border-primary-400 bg-white p-3 shadow-sm sm:p-4">
+        <h2 className="mb-2 flex items-center text-lg font-medium text-gray-800 sm:text-xl">
+          <BiBook className="mr-2 h-5 w-5 text-primary-400 sm:h-6 sm:w-6" />
+          Oku Uygulaması
         </h2>
-        <p className="text-sm text-gray-600 sm:text-base">
-          Oku, kitapseverlerin dijital ortamda kitap okuma deneyimini zenginleştirmek için
-          tasarlanmış bir web uygulamasıdır. Kitaplarınızı organize edebilir, okuma ilerleyişinizi
-          takip edebilir ve favori kitaplarınıza kolayca erişebilirsiniz.
+        <p className="text-sm text-gray-500">
+          Kitapseverlerin dijital ortamda kitap okuma deneyimini zenginleştirmek için tasarlanmış
+          bir web uygulaması.
         </p>
       </div>
 
