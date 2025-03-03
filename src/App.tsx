@@ -7,7 +7,7 @@ import { LastReadProvider } from './context/LastReadContext';
 // Bileşen importları
 import Header from './components/Header';
 import AboutPage from './pages/AboutPage';
-import BookDetailPage from './pages/BookDetailPage';
+import BookDetailPage from './pages/BookDetail/BookDetailPage';
 import BookshelfPage from './pages/BookshelfPage';
 import LibraryPage from './pages/LibraryPage';
 

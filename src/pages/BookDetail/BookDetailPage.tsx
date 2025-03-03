@@ -1,10 +1,13 @@
 import { motion, PanInfo, useAnimation } from 'framer-motion';
 import debounce from 'lodash/debounce';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { BiArrowBack } from 'react-icons/bi';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { useLastRead } from '../context/LastReadContext';
-import { books } from '../utils/books';
+import { useLastRead } from '../../context/LastReadContext';
+import { books } from '../../utils/books';
+import { BookImage } from './components/BookImage';
+import { BottomBar } from './components/BottomBar';
+import { EdgeControls } from './components/EdgeControls';
+import { TopBar } from './components/TopBar';
 
 const BookDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -253,23 +256,7 @@ const BookDetailPage = () => {
 
   return (
     <div className="fixed inset-0 bg-black">
-      {/* Üst Bar */}
-      <div
-        className={`${controlsClassName} top-0 bg-gradient-to-b from-black/70 to-transparent px-4 py-2`}
-      >
-        <div className="flex items-center justify-between text-white">
-          <button
-            onClick={handleGoBack}
-            className="flex items-center rounded-lg bg-white/10 px-4 py-2 text-sm font-medium backdrop-blur-sm transition-opacity hover:bg-white/20"
-          >
-            <BiArrowBack className="mr-2 h-5 w-5" />
-            Geri
-          </button>
-          <div className="flex items-center">
-            <h1 className="text-lg font-medium">{book.name}</h1>
-          </div>
-        </div>
-      </div>
+      <TopBar book={book} controlsClassName={controlsClassName} onGoBack={handleGoBack} />
 
       {/* Ana İçerik */}
       <motion.div
@@ -299,89 +286,33 @@ const BookDetailPage = () => {
               WebkitPerspective: 1000,
             }}
           >
-            {imageError ? (
-              <div className="flex min-h-full flex-col items-center justify-center p-8 text-center">
-                <div className="mb-4 text-2xl font-semibold text-white">Kitap Bitti</div>
-                <div className="text-lg text-white/70">Bu kitabı okumayı tamamladınız</div>
-                <button
-                  onClick={handleGoBack}
-                  className="mt-8 rounded-lg bg-white/10 px-6 py-3 text-white backdrop-blur-sm transition-colors hover:bg-white/20"
-                >
-                  Geri Dön
-                </button>
-              </div>
-            ) : (
-              <img
-                src={currentImageUrl}
-                alt={`${book.name} - Sayfa ${currentPage}`}
-                className="min-h-full w-full select-none object-contain landscape:object-cover"
-                onError={() => {
-                  setImageError(true);
-                  if (currentPage > 1) {
-                    setCurrentPage(currentPage - 1);
-                  }
-                }}
-                draggable={false}
-              />
-            )}
+            <BookImage
+              book={book}
+              currentPage={currentPage}
+              imageError={imageError}
+              currentImageUrl={currentImageUrl}
+              onError={() => {
+                setImageError(true);
+                if (currentPage > 1) {
+                  setCurrentPage(currentPage - 1);
+                }
+              }}
+              onGoBack={handleGoBack}
+            />
           </motion.div>
         </div>
 
-        {/* Kenar Kontrolleri */}
-        <div
-          className="absolute inset-y-0 left-0 z-10 h-full w-1/6 cursor-pointer"
-          onClick={e => handleEdgeControl('prev', e)}
-        />
-        <div
-          className="absolute inset-y-0 right-0 z-10 h-full w-1/6 cursor-pointer"
-          onClick={e => handleEdgeControl('next', e)}
-        />
+        <EdgeControls onEdgeControl={handleEdgeControl} />
       </motion.div>
 
-      {/* Alt Kontroller - motion.div dışına taşındı */}
-      <div
-        className={`${controlsClassName} bottom-0 m-4 rounded-xl bg-gradient-to-b from-black/70 to-transparent px-4 py-2`}
-      >
-        <div className="flex items-center justify-between text-white">
-          <div className="text-sm">
-            {book.writer && <div className="font-medium">{book.writer}</div>}
-            <div className="text-white/70">{book.publisher}</div>
-          </div>
-          <div className="flex items-center gap-8">
-            <button
-              onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage === 1}
-              className={buttonClassName}
-            >
-              <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 19l-7-7 7-7"
-                />
-              </svg>
-            </button>
-            <span className="rounded-lg bg-white/10 px-4 py-2 text-sm font-medium backdrop-blur-sm">
-              Sayfa {currentPage} / {book.pageCount}
-            </span>
-            <button
-              onClick={() => handlePageChange(currentPage + 1)}
-              disabled={imageError}
-              className={buttonClassName}
-            >
-              <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
-            </button>
-          </div>
-        </div>
-      </div>
+      <BottomBar
+        book={book}
+        currentPage={currentPage}
+        controlsClassName={controlsClassName}
+        buttonClassName={buttonClassName}
+        imageError={imageError}
+        onPageChange={handlePageChange}
+      />
 
       {/* Görünmez preload görselleri */}
       {!imageError && (
