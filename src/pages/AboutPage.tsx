@@ -176,12 +176,12 @@ const AboutPage = () => {
               <div>
                 <h4 className="font-medium">GitHub</h4>
                 <a
-                  href="https://github.com/ahmetsametoglu/oku-app"
+                  href="https://github.com/YamanSehzade/oku"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-sm text-primary-600 hover:text-primary-700"
                 >
-                  github.com/ahmetsametoglu/oku-app
+                  github.com/YamanSehzade/oku
                 </a>
               </div>
             </div>

@@ -1,54 +1,159 @@
-# React + TypeScript + Vite
+# 📚 OKU - Modern Okuma Deneyimi
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+OKU, kitapseverlerin dijital ortamda kitap okuma deneyimini zenginleştirmek için tasarlanmış modern bir web uygulamasıdır. React ve TypeScript kullanılarak geliştirilmiş olan bu platform, kullanıcılara kesintisiz ve keyifli bir okuma deneyimi sunmayı hedeflemektedir.
 
-Currently, two official plugins are available:
+🌐 **[Uygulamayı Kullanmak İçin Tıklayın](https://kitap--oku.web.app/)**
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 Özellikler
 
-## Expanding the ESLint configuration
+- 📚 Kitaplık Yönetimi (Favoriler, okuma durumu takibi, sayfa kaydetme)
+- 📱 Her cihazda mükemmel görünüm ve PWA desteği
+- 📖 Okuma geçmişi ve alışkanlık takibi
+- 🔄 Firebase ile gerçek zamanlı senkronizasyon
+- 🌙 Karanlık/Aydınlık mod desteği
+- 📊 Firebase Analytics ile kullanıcı deneyimi optimizasyonu
+- 🎯 Açık kaynak geliştirme
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 🛠️ Teknoloji Yığını
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-});
+- **Frontend Framework:** React 18
+- **Programlama Dili:** TypeScript
+- **Stil Kütüphanesi:** Tailwind CSS
+- **Routing:** React Router DOM
+- **State Yönetimi:** React Context API
+- **Backend & Analytics:** Firebase
+- **Build Tool:** Vite
+- **Animasyonlar:** Framer Motion
+- **Kod Kalitesi:** ESLint, Prettier
+- **Deployment:** Firebase Hosting
+
+## 📱 Kurulum Kılavuzu
+
+### iOS (Safari):
+
+1. Safari'de paylaş butonuna tıklayın
+2. "Ana Ekrana Ekle" seçeneğini seçin
+3. "Ekle" butonuna tıklayın
+
+### Android (Chrome):
+
+1. Chrome menüsünü açın (üç nokta)
+2. "Ana ekrana ekle" seçeneğini seçin
+3. "Yükle" butonuna tıklayın
+
+### Masaüstü (Chrome):
+
+1. Adres çubuğunun sağındaki "Yükle" simgesine tıklayın
+2. "Yükle" butonuna tıklayın
+
+## 📊 Gizlilik ve Analytics
+
+Uygulamamızı geliştirmek ve size daha iyi bir deneyim sunmak için Firebase Analytics kullanıyoruz. Bu araç sayesinde:
+
+- Kullanıcı deneyimini iyileştirme
+- Uygulama performansını izleme
+- Hata tespiti ve çözümü
+- Kullanım istatistiklerini analiz etme
+
+Toplanan veriler anonim olarak işlenir ve sadece uygulama geliştirme amacıyla kullanılır.
+
+## 🏗️ Proje Yapısı
+
+```
+oku/
+├── src/
+│   ├── assets/      # Statik dosyalar
+│   ├── components/  # Yeniden kullanılabilir bileşenler
+│   ├── config/      # Yapılandırma dosyaları
+│   ├── context/     # React Context dosyaları
+│   ├── helpers/     # Yardımcı fonksiyonlar
+│   ├── hooks/       # Özel React hooks
+│   ├── pages/       # Sayfa bileşenleri
+│   ├── styles/      # Global stil dosyaları
+│   ├── types/       # TypeScript tip tanımlamaları
+│   └── utils/       # Utility fonksiyonları
+├── public/          # Statik public dosyalar
+└── dist/           # Build çıktısı
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 🚦 Geliştirici Kurulumu
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x';
-import reactDom from 'eslint-plugin-react-dom';
+### Ön Gereksinimler
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-});
-```
+- Node.js (v18 veya üzeri)
+- npm veya yarn
+- Git
+
+### Kurulum
+
+1. Projeyi klonlayın:
+
+   ```bash
+   git clone https://github.com/YamanSehzade/oku.git
+   cd oku
+   ```
+
+2. Bağımlılıkları yükleyin:
+
+   ```bash
+   npm install
+   ```
+
+3. Geliştirme sunucusunu başlatın:
+
+   ```bash
+   npm run dev
+   ```
+
+4. Tarayıcınızda açın:
+   ```
+   http://localhost:5173
+   ```
+
+## 📝 Komutlar
+
+- `npm run dev`: Geliştirme sunucusunu başlatır
+- `npm run build`: Projeyi production için derler
+- `npm run lint`: ESLint ile kod kontrolü yapar
+- `npm run preview`: Build çıktısını önizler
+- `npm run deploy`: Firebase'e deploy eder
+
+## 🔧 Yapılandırma
+
+1. `.env.local` dosyası oluşturun ve Firebase yapılandırmanızı ekleyin:
+   ```env
+   VITE_FIREBASE_API_KEY=your_api_key
+   VITE_FIREBASE_AUTH_DOMAIN=your_auth_domain
+   VITE_FIREBASE_PROJECT_ID=your_project_id
+   VITE_FIREBASE_STORAGE_BUCKET=your_storage_bucket
+   VITE_FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id
+   VITE_FIREBASE_APP_ID=your_app_id
+   ```
+
+## 📚 İçerik Kaynağı
+
+Kitapların resimleri ve içerikleri [hizmetsource.com](https://www.hizmetsource.com/) sitesinden sağlanmaktadır.
+
+## 🤝 Katkıda Bulunma
+
+1. Bu repository'yi fork edin
+2. Feature branch'i oluşturun (`git checkout -b feature/AmazingFeature`)
+3. Değişikliklerinizi commit edin (`git commit -m 'Add some AmazingFeature'`)
+4. Branch'inizi push edin (`git push origin feature/AmazingFeature`)
+5. Pull Request oluşturun
+
+## 📄 Lisans
+
+Bu proje MIT lisansı altında lisanslanmıştır. Detaylar için [LICENSE](LICENSE) dosyasına bakın.
+
+## 📞 İletişim
+
+Yaman Şehzade - [yamansehzade@gmail.com](mailto:yamansehzade@gmail.com)
+
+Proje Linki: [https://github.com/YamanSehzade/oku](https://github.com/YamanSehzade/oku)
+
+Uygulama: [https://kitap--oku.web.app/](https://kitap--oku.web.app/)
+
+---
+
+⭐️ Bu projeyi beğendiyseniz yıldız vermeyi unutmayın!
