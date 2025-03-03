@@ -1,4 +1,4 @@
-import { motion, PanInfo, useAnimation } from 'framer-motion';
+import { motion } from 'framer-motion';
 import debounce from 'lodash/debounce';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
@@ -8,6 +8,9 @@ import { BookImage } from './components/BookImage';
 import { BottomBar } from './components/BottomBar';
 import { EdgeControls } from './components/EdgeControls';
 import { TopBar } from './components/TopBar';
+import { SWIPE_CONF, useBookAnimation } from './hooks/useBookAnimation';
+import { useBookEvents } from './hooks/useBookEvents';
+import { useBookImage } from './hooks/useBookImage';
 
 const BookDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -34,111 +37,30 @@ const BookDetailPage = () => {
 
   const [imageError, setImageError] = useState(false);
   const [showControls, setShowControls] = useState(true);
-  const controls = useAnimation();
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Kontrol sınıfları
-  const controlsClassName = useMemo(() => {
-    return `fixed inset-x-0 z-50 transition-opacity duration-300 ${
-      showControls ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'
-    }`;
-  }, [showControls]);
-
-  // Buton sınıfları
-  const buttonClassName = useMemo(() => {
-    return 'rounded-lg bg-white/10 p-2 text-white backdrop-blur-sm transition-colors hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-30';
-  }, []);
-
-  // Görsel önbelleğe alma için ref
-  const imageCache = useRef<Set<string>>(new Set());
-
-  // Görsel URL'lerini oluştur ve önbelleğe al
-  const { currentImageUrl, nextImageUrl, prevImageUrl } = useMemo(() => {
-    if (!book) return { currentImageUrl: '', nextImageUrl: '', prevImageUrl: '' };
-
-    const current = `${book.link}/${currentPage}.jpg`;
-    const next = `${book.link}/${currentPage + 1}.jpg`;
-    const prev = currentPage > 1 ? `${book.link}/${currentPage - 1}.jpg` : '';
-
-    return { currentImageUrl: current, nextImageUrl: next, prevImageUrl: prev };
-  }, [book, currentPage]);
-
-  // Görselleri önceden yükle
-  useEffect(() => {
-    if (!book || imageError) return;
-
-    const preloadImage = (url: string) => {
-      if (!url || imageCache.current.has(url)) return;
-
-      const img = new Image();
-      img.src = url;
-      imageCache.current.add(url);
-    };
-
-    preloadImage(nextImageUrl);
-    preloadImage(prevImageUrl);
-  }, [book, currentPage, nextImageUrl, prevImageUrl, imageError]);
-
-  // Sayfa değiştiğinde otomatik kaydet
-  useEffect(() => {
-    const saveTimeout = setTimeout(() => {
-      if (book) {
-        saveLastRead(book, currentPage, imageError);
-      }
-    }, 500); // 500ms debounce
-
-    return () => clearTimeout(saveTimeout);
-  }, [book, currentPage, imageError]);
-
-  // Ortak element kontrolü için yardımcı fonksiyon
-  const isClickableElement = useCallback((target: HTMLElement) => {
-    return (
-      target.tagName === 'BUTTON' ||
-      target.closest('button') ||
-      target.tagName === 'svg' ||
-      target.tagName === 'path'
-    );
-  }, []);
-
+  // Yardımcı fonksiyonlar
   const scrollToTop = useCallback(() => {
     if (containerRef.current) {
       containerRef.current.scrollTo({ top: 0, behavior: 'instant' });
     }
   }, []);
 
-  // Gesture kontrolü için sabitler
-  const SWIPE_CONF = {
-    threshold: 100,
-    velocity: 500,
-    dragElastic: 0.2,
-    animationDuration: 0.2,
-    transition: {
-      type: 'tween',
-      ease: 'easeOut',
-      duration: 0.2,
-      stiffness: 300,
-      damping: 30,
-    },
-  } as const;
+  const isClickableElement = useCallback((target: HTMLElement): boolean => {
+    return Boolean(
+      target.tagName === 'BUTTON' ||
+        target.closest('button') ||
+        target.tagName === 'svg' ||
+        target.tagName === 'path'
+    );
+  }, []);
 
-  const animatePageChange = useCallback(
-    async (direction: 'next' | 'prev') => {
-      const xOffset = direction === 'next' ? -window.innerWidth : window.innerWidth;
-      await controls.start({
-        x: xOffset,
-        transition: SWIPE_CONF.transition,
-      });
-      setCurrentPage(prev => (direction === 'next' ? prev + 1 : prev - 1));
-      setImageError(false);
-      scrollToTop();
-      await controls.set({ x: -xOffset });
-      await controls.start({
-        x: 0,
-        transition: SWIPE_CONF.transition,
-      });
-    },
-    [controls, scrollToTop]
-  );
+  // Hook'ları kullan
+  const { controls, animatePageChange } = useBookAnimation({
+    setCurrentPage,
+    setImageError,
+    scrollToTop,
+  });
 
   const handlePageChange = useCallback(
     async (newPage: number) => {
@@ -153,47 +75,20 @@ const BookDetailPage = () => {
     [currentPage, imageError, animatePageChange]
   );
 
-  // Event yönetimi için merkezi fonksiyon
-  const handleInteraction = useCallback(
-    (type: 'keyboard' | 'touch' | 'click', e: any) => {
-      // Tıklama kontrolü
-      if (type === 'click' && isClickableElement(e.target as HTMLElement)) {
-        return;
-      }
+  const { handleInteraction, handleDragEnd, handleEdgeControl } = useBookEvents({
+    currentPage,
+    imageError,
+    animatePageChange,
+    handlePageChange,
+    controls,
+    isClickableElement,
+  });
 
-      // Klavye kontrolü
-      if (type === 'keyboard') {
-        const key = (e as KeyboardEvent).key;
-        if (key === 'ArrowRight' && !imageError) {
-          handlePageChange(currentPage + 1);
-        } else if (key === 'ArrowLeft' && currentPage > 1) {
-          handlePageChange(currentPage - 1);
-        }
-        return;
-      }
-
-      // Dokunma kontrolü
-      if (type === 'touch') {
-        const info = e as PanInfo;
-        const { velocity, threshold } = SWIPE_CONF;
-        const canGoNext = !imageError;
-        const canGoPrev = currentPage > 1;
-
-        if (info.velocity.x < -velocity && canGoNext) {
-          animatePageChange('next');
-        } else if (info.velocity.x > velocity && canGoPrev) {
-          animatePageChange('prev');
-        } else if (info.offset.x < -threshold && canGoNext) {
-          animatePageChange('next');
-        } else if (info.offset.x > threshold && canGoPrev) {
-          animatePageChange('prev');
-        } else {
-          controls.start({ x: 0, transition: { duration: SWIPE_CONF.animationDuration } });
-        }
-      }
-    },
-    [currentPage, imageError, handlePageChange, animatePageChange, controls, isClickableElement]
-  );
+  const { currentImageUrl, nextImageUrl, prevImageUrl } = useBookImage({
+    book,
+    currentPage,
+    imageError,
+  });
 
   // Klavye event listener'ı
   useEffect(() => {
@@ -202,26 +97,33 @@ const BookDetailPage = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [handleInteraction]);
 
-  // Drag end handler'ı
-  const handleDragEnd = useCallback(
-    (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-      handleInteraction('touch', info);
-    },
-    [handleInteraction]
-  );
+  // Sayfa değiştiğinde otomatik kaydet
+  useEffect(() => {
+    const saveTimeout = setTimeout(() => {
+      if (book) {
+        saveLastRead(book, currentPage, imageError);
+      }
+    }, 500); // 500ms debounce
 
-  // Edge control handler'ı
-  const handleEdgeControl = useCallback(
-    (direction: 'prev' | 'next', e: React.MouseEvent) => {
-      if (isClickableElement(e.target as HTMLElement)) return;
+    return () => clearTimeout(saveTimeout);
+  }, [book, currentPage, imageError]);
 
-      e.preventDefault();
-      e.stopPropagation();
+  // Kontrol sınıfları
+  const controlsClassName = useMemo(() => {
+    return `fixed inset-x-0 z-50 transition-opacity duration-300 ${
+      showControls ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'
+    }`;
+  }, [showControls]);
 
-      handlePageChange(direction === 'next' ? currentPage + 1 : currentPage - 1);
-    },
-    [currentPage, handlePageChange, isClickableElement]
-  );
+  // Buton sınıfları
+  const buttonClassName = useMemo(() => {
+    return 'rounded-lg bg-white/10 p-2 text-white backdrop-blur-sm transition-colors hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-30';
+  }, []);
+
+  const handleGoBack = useCallback(() => {
+    const previousPath = location.state?.from || '/';
+    navigate(previousPath);
+  }, [location.state, navigate]);
 
   // Screen tap handler'ı - debounce eklenmiş
   const handleScreenTap = useMemo(
@@ -232,11 +134,6 @@ const BookDetailPage = () => {
       }, 100),
     [isClickableElement]
   );
-
-  const handleGoBack = useCallback(() => {
-    const previousPath = location.state?.from || '/';
-    navigate(previousPath);
-  }, [location.state, navigate]);
 
   if (!book) {
     return (
