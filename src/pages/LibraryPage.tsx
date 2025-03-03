@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { BiBookOpen, BiSearch } from 'react-icons/bi';
+import { BiBookOpen, BiError, BiFilterAlt, BiSearch } from 'react-icons/bi';
 import BookCard from '../components/BookCard';
 import { books } from '../utils/books';
 
@@ -95,7 +95,8 @@ const LibraryPage = () => {
 
       {/* Sonuç Bilgisi */}
       {searchTerm && (
-        <p className="text-sm text-gray-600">
+        <p className="flex items-center text-sm text-gray-600">
+          <BiFilterAlt className="mr-1.5 h-4 w-4 text-gray-400" />
           <span className="font-medium">{filteredBooks.length}</span> sonuç bulundu
         </p>
       )}
@@ -110,6 +111,7 @@ const LibraryPage = () => {
       {/* Sonuç Bulunamadı */}
       {filteredBooks.length === 0 && (
         <div className="rounded-lg border-2 border-dashed border-gray-200 p-8 text-center">
+          <BiError className="mx-auto mb-3 h-8 w-8 text-gray-400" />
           <p className="text-gray-500">Aramanızla eşleşen kitap bulunamadı.</p>
         </div>
       )}

@@ -1,4 +1,13 @@
-import { BiBook, BiBookHeart, BiDevices, BiEnvelope, BiGitBranch, BiHistory } from 'react-icons/bi';
+import {
+  BiBookHeart,
+  BiCopyright,
+  BiDevices,
+  BiDownload,
+  BiEnvelope,
+  BiGitBranch,
+  BiHistory,
+  BiInfoCircle,
+} from 'react-icons/bi';
 
 const AboutPage = () => {
   const currentYear = new Date().getFullYear();
@@ -8,7 +17,7 @@ const AboutPage = () => {
       {/* Başlık */}
       <div className="rounded-lg border-l-2 border-primary-400 bg-white p-3 shadow-sm sm:p-4">
         <h2 className="mb-2 flex items-center text-lg font-medium text-gray-800 sm:text-xl">
-          <BiBook className="mr-2 h-5 w-5 text-primary-400 sm:h-6 sm:w-6" />
+          <BiInfoCircle className="mr-2 h-5 w-5 text-primary-400 sm:h-6 sm:w-6" />
           Oku Uygulaması
         </h2>
         <p className="text-sm text-gray-500">
@@ -19,7 +28,10 @@ const AboutPage = () => {
 
       {/* Özellikler */}
       <section className="space-y-4">
-        <h3 className="text-lg font-semibold text-gray-900">Özellikler</h3>
+        <h3 className="flex items-center text-lg font-semibold text-gray-900">
+          <BiBookHeart className="mr-2 h-5 w-5 text-gray-700" />
+          Özellikler
+        </h3>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <div className="rounded-lg bg-white p-4 shadow">
             <div className="mb-3 flex items-center">
@@ -69,7 +81,10 @@ const AboutPage = () => {
 
       {/* Kurulum */}
       <section className="space-y-4">
-        <h3 className="text-lg font-semibold text-gray-900">Kurulum</h3>
+        <h3 className="flex items-center text-lg font-semibold text-gray-900">
+          <BiDownload className="mr-2 h-5 w-5 text-gray-700" />
+          Kurulum
+        </h3>
         <div className="rounded-lg bg-white p-4 shadow">
           <h4 className="mb-3 font-medium">Cihazınıza Nasıl Kurarsınız?</h4>
           <div className="space-y-3 text-sm text-gray-600">
@@ -98,7 +113,10 @@ const AboutPage = () => {
 
       {/* İletişim */}
       <section className="space-y-4">
-        <h3 className="text-lg font-semibold text-gray-900">İletişim</h3>
+        <h3 className="flex items-center text-lg font-semibold text-gray-900">
+          <BiEnvelope className="mr-2 h-5 w-5 text-gray-700" />
+          İletişim
+        </h3>
         <div className="rounded-lg bg-white p-4 shadow">
           <div className="flex items-center space-x-4">
             <BiEnvelope className="h-5 w-5 text-primary-500" />
@@ -145,7 +163,10 @@ const AboutPage = () => {
 
       {/* Sürüm Bilgisi */}
       <div className="text-center text-sm text-gray-500">
-        <p>Oku Uygulaması v1.0.0</p>
+        <p className="flex items-center justify-center">
+          <BiCopyright className="mr-1.5 h-4 w-4" />
+          Oku Uygulaması v1.0.0
+        </p>
         <p className="mt-1">© {currentYear} Tüm hakları saklıdır.</p>
       </div>
     </div>

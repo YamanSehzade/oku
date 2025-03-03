@@ -1,4 +1,4 @@
-import { BiBookOpen, BiHeart, BiInfoCircle, BiMenu } from 'react-icons/bi';
+import { BiBookOpen, BiInfoCircle, BiLibrary, BiMenuAltRight } from 'react-icons/bi';
 import { Link } from 'react-router-dom';
 
 type Props = {
@@ -26,7 +26,7 @@ const Header = ({ activeTab, setActiveTab, isMenuOpen, setIsMenuOpen }: Props) =
     {
       id: 'kitaplik',
       name: 'Kitaplık',
-      icon: BiHeart,
+      icon: BiLibrary,
       href: '/kitaplik',
     },
     {
@@ -48,17 +48,17 @@ const Header = ({ activeTab, setActiveTab, isMenuOpen, setIsMenuOpen }: Props) =
               alt="Oku Logo"
               className="mr-3 h-10 w-10 sm:h-12 sm:w-12"
             />
-            <h1 className="font-display text-2xl font-bold text-secondary-600 sm:text-3xl">Oku</h1>
+            <h1 className="font-display text-2xl font-bold text-secondary-600 sm:text-3xl">OKU</h1>
           </div>
 
           {/* Mobil Menü Butonu */}
           <div className="sm:hidden">
             <button
               type="button"
-              className="inline-flex items-center justify-center rounded-md p-2 text-secondary-500 hover:bg-secondary-100 hover:text-secondary-600 focus:outline-none"
+              className="inline-flex items-center justify-center rounded-md p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-600 focus:outline-none"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
-              <BiMenu className="h-6 w-6" />
+              <BiMenuAltRight className="h-7 w-7" />
             </button>
           </div>
 
@@ -70,12 +70,16 @@ const Header = ({ activeTab, setActiveTab, isMenuOpen, setIsMenuOpen }: Props) =
                 to={tab.href}
                 className={`${
                   activeTab === tab.id
-                    ? 'border-secondary-500 text-gray-900'
+                    ? 'border-primary-500 text-primary-600'
                     : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-                } inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium`}
+                } inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium transition-colors duration-200`}
                 onClick={() => setActiveTab(tab.id)}
               >
-                <tab.icon className="mr-2 h-5 w-5" />
+                <tab.icon
+                  className={`mr-2 h-5 w-5 ${
+                    activeTab === tab.id ? 'text-primary-500' : 'text-gray-400'
+                  }`}
+                />
                 {tab.name}
               </Link>
             ))}
@@ -91,16 +95,20 @@ const Header = ({ activeTab, setActiveTab, isMenuOpen, setIsMenuOpen }: Props) =
                 to={tab.href}
                 className={`${
                   activeTab === tab.id
-                    ? 'border-secondary-500 bg-secondary-50 text-secondary-700'
+                    ? 'border-primary-500 bg-primary-50 text-primary-700'
                     : 'border-transparent text-gray-500 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700'
-                } block border-l-4 py-2 pl-3 pr-4 text-base font-medium`}
+                } block border-l-4 py-2 pl-3 pr-4 text-base font-medium transition-colors duration-200`}
                 onClick={() => {
                   setActiveTab(tab.id);
                   setIsMenuOpen(false);
                 }}
               >
                 <div className="flex items-center">
-                  <tab.icon className="mr-2 h-5 w-5" />
+                  <tab.icon
+                    className={`mr-2 h-5 w-5 ${
+                      activeTab === tab.id ? 'text-primary-500' : 'text-gray-400'
+                    }`}
+                  />
                   {tab.name}
                 </div>
               </Link>

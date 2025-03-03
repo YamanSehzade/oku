@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { BiBookmark, BiHeart, BiHistory } from 'react-icons/bi';
+import { BiBookmark, BiError, BiHeart, BiHistory, BiLibrary } from 'react-icons/bi';
 import BookCard from '../components/BookCard';
 import { useFavorites } from '../context/FavoritesContext';
 import { useLastRead } from '../context/LastReadContext';
@@ -46,7 +46,7 @@ const BookshelfPage = () => {
       {/* Sayfa Başlığı */}
       <div className="rounded-lg border-l-2 border-primary-400 bg-white p-3 shadow-sm sm:p-4">
         <h2 className="mb-2 flex items-center text-lg font-medium text-gray-800 sm:text-xl">
-          <BiHeart className="mr-2 h-5 w-5 text-primary-400 sm:h-6 sm:w-6" />
+          <BiLibrary className="mr-2 h-5 w-5 text-primary-400 sm:h-6 sm:w-6" />
           Kitaplığım
         </h2>
         <p className="text-sm text-gray-500">
@@ -112,6 +112,7 @@ const BookshelfPage = () => {
       {/* Boş Durum */}
       {recentlyReadBooks.length === 0 && favorites.length === 0 && finishedBooks.length === 0 && (
         <div className="text-center text-gray-500">
+          <BiError className="mx-auto mb-3 h-8 w-8 text-gray-400" />
           <p>Henüz kitaplığınızda kitap bulunmuyor.</p>
           <p>Kitap okumaya başlayın veya favori kitaplarınızı ekleyin.</p>
         </div>
