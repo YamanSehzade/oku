@@ -1,5 +1,6 @@
-import { useMemo } from 'react';
-import { BiBookmark, BiError, BiHeart, BiHistory, BiLibrary } from 'react-icons/bi';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useMemo, useState } from 'react';
+import { BiBookmark, BiChevronDown, BiError, BiHeart, BiHistory, BiLibrary } from 'react-icons/bi';
 import BookCard from '../components/BookCard';
 import { useFavorites } from '../context/FavoritesContext';
 import { useLastRead } from '../context/LastReadContext';
@@ -11,6 +12,33 @@ import { books } from '../utils/books';
 const BookshelfPage = () => {
   const { lastReadPages } = useLastRead();
   const { favorites } = useFavorites();
+
+  // Kartların açık/kapalı durumunu tutacak state'ler
+  const [isRecentOpen, setIsRecentOpen] = useState(true);
+  const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
+  const [isFinishedOpen, setIsFinishedOpen] = useState(false);
+
+  // Bölümleri açıp kapatma fonksiyonu
+  const toggleSection = (section: 'recent' | 'favorites' | 'finished') => {
+    // Aynı bölüme tıklandığında sadece o bölümü aç/kapat
+    if (section === 'recent' && isRecentOpen) {
+      setIsRecentOpen(false);
+      return;
+    }
+    if (section === 'favorites' && isFavoritesOpen) {
+      setIsFavoritesOpen(false);
+      return;
+    }
+    if (section === 'finished' && isFinishedOpen) {
+      setIsFinishedOpen(false);
+      return;
+    }
+
+    // Farklı bir bölüme tıklandığında diğerlerini kapat
+    setIsRecentOpen(section === 'recent');
+    setIsFavoritesOpen(section === 'favorites');
+    setIsFinishedOpen(section === 'finished');
+  };
 
   // Son okunan kitapları tarihe göre sırala ve son 5 kitabı al
   const recentlyReadBooks = useMemo(() => {
@@ -56,65 +84,136 @@ const BookshelfPage = () => {
 
       {/* Son Okunan Kitaplar */}
       {recentlyReadBooks.length > 0 && (
-        <section className="space-y-4">
-          <h3 className="flex items-center text-lg font-semibold text-gray-900">
-            <BiHistory className="mr-2 h-5 w-5" />
-            Son Okunan Kitaplar
-          </h3>
-          <div className="grid gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-            {recentlyReadBooks.map((book, index) => (
-              <BookCard
-                key={book.link}
-                book={book}
-                index={index}
-                lastReadPage={lastReadPages.find(lrp => lrp.book.link === book.link)?.page}
-              />
-            ))}
-          </div>
+        <section className="overflow-hidden rounded-lg bg-white shadow-md">
+          <button
+            onClick={() => toggleSection('recent')}
+            className="flex w-full items-center justify-between p-6 hover:bg-gray-50"
+          >
+            <h3 className="flex items-center text-lg font-semibold text-gray-900">
+              <BiHistory className="mr-2 h-5 w-5 text-primary-500" />
+              Son Okunan Kitaplar
+            </h3>
+            <motion.div animate={{ rotate: isRecentOpen ? 180 : 0 }} transition={{ duration: 0.3 }}>
+              <BiChevronDown className="h-6 w-6 text-gray-500" />
+            </motion.div>
+          </button>
+          <AnimatePresence>
+            {isRecentOpen && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <div className="border-t border-gray-100 p-6">
+                  <div className="grid gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                    {recentlyReadBooks.map((book, index) => (
+                      <BookCard
+                        key={book.link}
+                        book={book}
+                        index={index}
+                        lastReadPage={lastReadPages.find(lrp => lrp.book.link === book.link)?.page}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </section>
       )}
 
       {/* Favori Kitaplar */}
       {favorites.length > 0 && (
-        <section className="space-y-4">
-          <h3 className="flex items-center text-lg font-semibold text-gray-900">
-            <BiHeart className="mr-2 h-5 w-5" />
-            Favori Kitaplar
-          </h3>
-          <div className="grid gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-            {favorites.map((book, index) => (
-              <BookCard key={book.link} book={book} index={index} />
-            ))}
-          </div>
+        <section className="overflow-hidden rounded-lg bg-white shadow-md">
+          <button
+            onClick={() => toggleSection('favorites')}
+            className="flex w-full items-center justify-between p-6 hover:bg-gray-50"
+          >
+            <h3 className="flex items-center text-lg font-semibold text-gray-900">
+              <BiHeart className="mr-2 h-5 w-5 text-primary-500" />
+              Favori Kitaplar
+            </h3>
+            <motion.div
+              animate={{ rotate: isFavoritesOpen ? 180 : 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <BiChevronDown className="h-6 w-6 text-gray-500" />
+            </motion.div>
+          </button>
+          <AnimatePresence>
+            {isFavoritesOpen && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <div className="border-t border-gray-100 p-6">
+                  <div className="grid gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                    {favorites.map((book, index) => (
+                      <BookCard key={book.link} book={book} index={index} />
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </section>
       )}
 
       {/* Biten Kitaplar */}
       {finishedBooks.length > 0 && (
-        <section className="space-y-4">
-          <h3 className="flex items-center text-lg font-semibold text-gray-900">
-            <BiBookmark className="mr-2 h-5 w-5" />
-            Biten Kitaplar
-          </h3>
-          <div className="grid gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-            {finishedBooks.map((book, index) => (
-              <BookCard
-                key={book.link}
-                book={book}
-                index={index}
-                lastReadPage={lastReadPages.find(lrp => lrp.book.link === book.link)?.page}
-              />
-            ))}
-          </div>
+        <section className="overflow-hidden rounded-lg bg-white shadow-md">
+          <button
+            onClick={() => toggleSection('finished')}
+            className="flex w-full items-center justify-between p-6 hover:bg-gray-50"
+          >
+            <h3 className="flex items-center text-lg font-semibold text-gray-900">
+              <BiBookmark className="mr-2 h-5 w-5 text-primary-500" />
+              Biten Kitaplar
+            </h3>
+            <motion.div
+              animate={{ rotate: isFinishedOpen ? 180 : 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <BiChevronDown className="h-6 w-6 text-gray-500" />
+            </motion.div>
+          </button>
+          <AnimatePresence>
+            {isFinishedOpen && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <div className="border-t border-gray-100 p-6">
+                  <div className="grid gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                    {finishedBooks.map((book, index) => (
+                      <BookCard
+                        key={book.link}
+                        book={book}
+                        index={index}
+                        lastReadPage={lastReadPages.find(lrp => lrp.book.link === book.link)?.page}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </section>
       )}
 
       {/* Boş Durum */}
       {recentlyReadBooks.length === 0 && favorites.length === 0 && finishedBooks.length === 0 && (
-        <div className="text-center text-gray-500">
-          <BiError className="mx-auto mb-3 h-8 w-8 text-gray-400" />
-          <p>Henüz kitaplığınızda kitap bulunmuyor.</p>
-          <p>Kitap okumaya başlayın veya favori kitaplarınızı ekleyin.</p>
+        <div className="rounded-lg bg-white p-8 text-center text-gray-500 shadow-md">
+          <BiError className="mx-auto mb-4 h-12 w-12 text-gray-400" />
+          <p className="text-lg font-medium">Henüz kitaplığınızda kitap bulunmuyor.</p>
+          <p className="mt-2 text-gray-600">
+            Kitap okumaya başlayın veya favori kitaplarınızı ekleyin.
+          </p>
         </div>
       )}
     </div>

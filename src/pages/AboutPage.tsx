@@ -1,4 +1,5 @@
 import {
+  BiBook,
   BiBookHeart,
   BiCopyright,
   BiDevices,
@@ -27,13 +28,13 @@ const AboutPage = () => {
       </div>
 
       {/* Özellikler */}
-      <section className="space-y-4">
+      <section className="space-y-4 rounded-lg bg-white p-6 shadow-md">
         <h3 className="flex items-center text-lg font-semibold text-gray-900">
           <BiBookHeart className="mr-2 h-5 w-5 text-gray-700" />
           Özellikler
         </h3>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <div className="rounded-lg bg-white p-4 shadow">
+          <div className="rounded-lg bg-white p-4 shadow-lg ring-1 ring-black/5 transition-shadow hover:shadow-xl">
             <div className="mb-3 flex items-center">
               <BiBookHeart className="mr-2 h-5 w-5 text-primary-500" />
               <h4 className="font-medium">Kitaplık Yönetimi</h4>
@@ -44,7 +45,7 @@ const AboutPage = () => {
             </p>
           </div>
 
-          <div className="rounded-lg bg-white p-4 shadow">
+          <div className="rounded-lg bg-white p-4 shadow-lg ring-1 ring-black/5 transition-shadow hover:shadow-xl">
             <div className="mb-3 flex items-center">
               <BiHistory className="mr-2 h-5 w-5 text-primary-500" />
               <h4 className="font-medium">Okuma Geçmişi</h4>
@@ -55,7 +56,7 @@ const AboutPage = () => {
             </p>
           </div>
 
-          <div className="rounded-lg bg-white p-4 shadow">
+          <div className="rounded-lg bg-white p-4 shadow-lg ring-1 ring-black/5 transition-shadow hover:shadow-xl">
             <div className="mb-3 flex items-center">
               <BiGitBranch className="mr-2 h-5 w-5 text-primary-500" />
               <h4 className="font-medium">Açık Kaynak</h4>
@@ -66,7 +67,7 @@ const AboutPage = () => {
             </p>
           </div>
 
-          <div className="rounded-lg bg-white p-4 shadow">
+          <div className="rounded-lg bg-white p-4 shadow-lg ring-1 ring-black/5 transition-shadow hover:shadow-xl">
             <div className="mb-3 flex items-center">
               <BiDevices className="mr-2 h-5 w-5 text-primary-500" />
               <h4 className="font-medium">Mobil Uygulama</h4>
@@ -80,12 +81,12 @@ const AboutPage = () => {
       </section>
 
       {/* Kurulum */}
-      <section className="space-y-4">
+      <section className="space-y-4 rounded-lg bg-white p-6 shadow-md">
         <h3 className="flex items-center text-lg font-semibold text-gray-900">
           <BiDownload className="mr-2 h-5 w-5 text-gray-700" />
           Kurulum
         </h3>
-        <div className="rounded-lg bg-white p-4 shadow">
+        <div className="rounded-lg bg-gray-50 p-4">
           <h4 className="mb-3 font-medium">Cihazınıza Nasıl Kurarsınız?</h4>
           <div className="space-y-3 text-sm text-gray-600">
             <p className="font-medium">iOS (Safari):</p>
@@ -112,50 +113,62 @@ const AboutPage = () => {
       </section>
 
       {/* İletişim */}
-      <section className="space-y-4">
+      <section className="space-y-4 rounded-lg bg-white p-6 shadow-md">
         <h3 className="flex items-center text-lg font-semibold text-gray-900">
           <BiEnvelope className="mr-2 h-5 w-5 text-gray-700" />
           İletişim
         </h3>
-        <div className="rounded-lg bg-white p-4 shadow">
-          <div className="flex items-center space-x-4">
-            <BiEnvelope className="h-5 w-5 text-primary-500" />
-            <div>
-              <h4 className="font-medium">Bize Ulaşın</h4>
-              <p className="mt-1 text-sm text-gray-600">
-                Soru, öneri ve geri bildirimleriniz için:
-                <a
-                  href="mailto:yamansehzade@gmail.com"
-                  className="ml-1 text-primary-600 hover:text-primary-700"
-                >
-                  yamansehzade@gmail.com
-                </a>
-              </p>
-              <p className="mt-2 text-sm text-gray-600">
-                GitHub:
+        <div className="rounded-lg bg-gray-50 p-4">
+          <div className="space-y-4">
+            <div className="flex items-start space-x-4">
+              <BiEnvelope className="mt-1 h-5 w-5 flex-shrink-0 text-primary-500" />
+              <div>
+                <h4 className="font-medium">Bize Ulaşın</h4>
+                <p className="mt-1 text-sm text-gray-600">
+                  Soru, öneri ve geri bildirimleriniz için:
+                  <a
+                    href="mailto:yamansehzade@gmail.com"
+                    className="ml-1 text-primary-600 hover:text-primary-700"
+                  >
+                    yamansehzade@gmail.com
+                  </a>
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start space-x-4">
+              <BiGitBranch className="mt-1 h-5 w-5 flex-shrink-0 text-primary-500" />
+              <div>
+                <h4 className="font-medium">GitHub</h4>
                 <a
                   href="https://github.com/ahmetsametoglu/oku-app"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="ml-1 text-primary-600 hover:text-primary-700"
+                  className="text-sm text-primary-600 hover:text-primary-700"
                 >
                   github.com/ahmetsametoglu/oku-app
                 </a>
-              </p>
-              <p className="mt-2 text-sm text-gray-600">
-                Kitap İçerikleri:
-                <a
-                  href="https://www.hizmetsource.com/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="ml-1 text-primary-600 hover:text-primary-700"
-                >
-                  hizmetsource.com
-                </a>
-                <span className="ml-1 block text-xs text-gray-500">
-                  (Kitapların resimleri ve içerikleri kaynak siteden sağlanmaktadır)
-                </span>
-              </p>
+              </div>
+            </div>
+
+            <div className="flex items-start space-x-4">
+              <BiBook className="mt-1 h-5 w-5 flex-shrink-0 text-primary-500" />
+              <div>
+                <h4 className="font-medium">Kitap İçerikleri</h4>
+                <div>
+                  <a
+                    href="https://www.hizmetsource.com/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-primary-600 hover:text-primary-700"
+                  >
+                    hizmetsource.com
+                  </a>
+                  <span className="ml-1 block text-xs text-gray-500">
+                    (Kitapların resimleri ve içerikleri kaynak siteden sağlanmaktadır)
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
