@@ -51,16 +51,18 @@ const LibraryPage = () => {
       .filter(word => word.length > 0);
     if (searchWords.length === 0) return true;
 
-    // Tüm kitap bilgilerini birleştir
-    const allBookInfo = [
+    // Her bir kitap alanını ayrı ayrı kontrol et ve kelime parçalarını birleştir
+    const bookFieldsText = [
       normalizeText(book.name),
       normalizeText(book.writer),
       normalizeText(book.publisher),
       normalizeText(book.series),
-    ].join(' ');
+    ]
+      .filter(Boolean) // null/undefined değerleri filtrele
+      .join(' '); // Tüm alanları birleştir
 
     // Her bir arama kelimesi kitap bilgilerinin herhangi bir yerinde geçiyor mu kontrol et
-    return searchWords.every(word => allBookInfo.includes(word));
+    return searchWords.every(searchWord => bookFieldsText.includes(searchWord));
   });
 
   return (
