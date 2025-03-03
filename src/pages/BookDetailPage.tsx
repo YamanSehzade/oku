@@ -1,6 +1,5 @@
-import { useState, useRef, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { books } from '../utils/books';
 
 const BookDetailPage = () => {
@@ -8,7 +7,7 @@ const BookDetailPage = () => {
   const navigate = useNavigate();
   const bookIndex = id ? parseInt(id) : -1;
   const book = bookIndex >= 0 && bookIndex < books.length ? books[bookIndex] : null;
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(2);
   const [imageError, setImageError] = useState(false);
   const [showControls, setShowControls] = useState(true);
 
@@ -26,72 +25,6 @@ const BookDetailPage = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [currentPage, imageError]);
 
-  // Touch kontrolü için state'ler
-  const touchStartX = useRef<number>(0);
-  const touchEndX = useRef<number>(0);
-  const isSwiping = useRef<boolean>(false);
-  const swipeThreshold = 50;
-
-  const handleTouchStart = (e: React.TouchEvent) => {
-    // Sadece yatay kaydırma için başlangıç noktasını kaydet
-    const touch = e.touches[0];
-    touchStartX.current = touch.clientX;
-    touchEndX.current = touch.clientX;
-    isSwiping.current = true;
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (!isSwiping.current) return;
-
-    const touch = e.touches[0];
-    const deltaX = touchStartX.current - touch.clientX;
-    const isHorizontalSwipe = Math.abs(deltaX) > 10;
-
-    // Sadece yatay kaydırma varsa sayfanın scroll'unu engelle
-    if (isHorizontalSwipe) {
-      e.preventDefault();
-      touchEndX.current = touch.clientX;
-    }
-  };
-
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    if (!isSwiping.current) return;
-    
-    const swipeDistance = touchStartX.current - touchEndX.current;
-    const isSignificantSwipe = Math.abs(swipeDistance) > swipeThreshold;
-
-    if (isSignificantSwipe) {
-      if (swipeDistance > 0 && !imageError) {
-        handlePageChange(currentPage + 1);
-      } else if (swipeDistance < 0 && currentPage > 1) {
-        handlePageChange(currentPage - 1);
-      }
-    } else {
-      // Küçük dokunuşlarda kontrolleri göster/gizle
-      const touchDuration = Date.now() - touchStartTime.current;
-      if (touchDuration < 200) { // 200ms'den kısa dokunuşlar tap sayılır
-        setShowControls(!showControls);
-      }
-    }
-
-    isSwiping.current = false;
-    touchStartX.current = 0;
-    touchEndX.current = 0;
-  };
-
-  // Touch başlangıç zamanını tutmak için ref
-  const touchStartTime = useRef<number>(0);
-
-  // Touch başlangıcında zamanı kaydet
-  useEffect(() => {
-    const handleTouchStartTime = () => {
-      touchStartTime.current = Date.now();
-    };
-
-    window.addEventListener('touchstart', handleTouchStartTime, { passive: true });
-    return () => window.removeEventListener('touchstart', handleTouchStartTime);
-  }, []);
-
   const handlePageChange = (newPage: number) => {
     if (newPage > 0) {
       setCurrentPage(newPage);
@@ -100,11 +33,12 @@ const BookDetailPage = () => {
   };
 
   const handleScreenTap = (e: React.MouseEvent) => {
-    // Butonlara tıklandığında kontrolleri değiştirme
-    if ((e.target as HTMLElement).tagName === 'BUTTON' || 
-        (e.target as HTMLElement).closest('button') ||
-        (e.target as HTMLElement).tagName === 'svg' ||
-        (e.target as HTMLElement).tagName === 'path') {
+    if (
+      (e.target as HTMLElement).tagName === 'BUTTON' ||
+      (e.target as HTMLElement).closest('button') ||
+      (e.target as HTMLElement).tagName === 'svg' ||
+      (e.target as HTMLElement).tagName === 'path'
+    ) {
       return;
     }
     setShowControls(!showControls);
@@ -112,12 +46,12 @@ const BookDetailPage = () => {
 
   if (!book) {
     return (
-      <div className="h-screen flex items-center justify-center">
+      <div className="flex h-screen items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Kitap bulunamadı</h2>
+          <h2 className="mb-4 text-2xl font-bold text-gray-900">Kitap bulunamadı</h2>
           <button
-            onClick={() => navigate("/")}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            onClick={() => navigate('/')}
+            className="rounded-lg bg-blue-600 px-6 py-2 text-white transition-colors hover:bg-blue-700"
           >
             Ana Sayfaya Dön
           </button>
@@ -128,25 +62,18 @@ const BookDetailPage = () => {
 
   return (
     <div className="fixed inset-0 bg-black">
-      <div 
-        className="h-full w-full flex items-center justify-center overflow-y-auto"
+      <div
+        className="flex h-full w-full items-center justify-center overflow-y-auto"
         onClick={handleScreenTap}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
       >
         <div className="absolute inset-0 flex items-start justify-center overflow-y-auto">
           {imageError ? (
-            <div className="flex flex-col items-center justify-center p-8 text-center min-h-full">
-              <div className="text-white text-2xl font-semibold mb-4">
-                Kitap Bitti
-              </div>
-              <div className="text-white/70 text-lg">
-                Bu kitabı okumayı tamamladınız
-              </div>
+            <div className="flex min-h-full flex-col items-center justify-center p-8 text-center">
+              <div className="mb-4 text-2xl font-semibold text-white">Kitap Bitti</div>
+              <div className="text-lg text-white/70">Bu kitabı okumayı tamamladınız</div>
               <button
-                onClick={() => navigate("/")}
-                className="mt-8 px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-lg backdrop-blur-sm transition-colors"
+                onClick={() => navigate('/')}
+                className="mt-8 rounded-lg bg-white/10 px-6 py-3 text-white backdrop-blur-sm transition-colors hover:bg-white/20"
               >
                 Ana Sayfaya Dön
               </button>
@@ -155,7 +82,7 @@ const BookDetailPage = () => {
             <img
               src={`${book.link}/${currentPage}.jpg`}
               alt={`${book.name} - Sayfa ${currentPage}`}
-              className="w-full min-h-full object-contain landscape:object-cover select-none touch-none"
+              className="min-h-full w-full select-none object-contain landscape:object-cover"
               onError={() => {
                 setImageError(true);
                 if (currentPage > 1) {
@@ -168,15 +95,17 @@ const BookDetailPage = () => {
         </div>
 
         {/* Alt Kontroller - Sabit Pozisyon */}
-        <div 
-          className={`fixed inset-x-0 bottom-0 px-4 py-2 m-4 rounded-xl bg-gradient-to-b from-black/70 to-transparent transition-all duration-300 z-50 ${
-            showControls ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        <div
+          className={`fixed inset-x-0 bottom-0 z-50 m-4 rounded-xl bg-gradient-to-b from-black/70 to-transparent px-4 py-2 transition-opacity duration-300 ${
+            showControls ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'
           }`}
         >
-          <div className="flex justify-between items-center text-white pointer-events-auto">
+          <div className="flex items-center justify-between text-white">
             <button
-              onClick={() => navigate("/")}
-              className="text-sm font-medium hover:opacity-100 transition-opacity bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg backdrop-blur-sm"
+              onClick={() => {
+                navigate('/');
+              }}
+              className="rounded-lg bg-white/10 px-4 py-2 text-sm font-medium backdrop-blur-sm transition-opacity hover:bg-white/20 hover:opacity-100"
             >
               Ana Sayfa
             </button>
@@ -184,22 +113,32 @@ const BookDetailPage = () => {
               <button
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
-                className="p-2 rounded-lg bg-white/10 text-white backdrop-blur-sm disabled:opacity-30 disabled:cursor-not-allowed hover:bg-white/20 transition-colors"
+                className="rounded-lg bg-white/10 p-2 text-white backdrop-blur-sm transition-colors hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-30"
               >
-                <svg className="w-6 h-6 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 19l-7-7 7-7"
+                  />
                 </svg>
               </button>
-              <span className="text-sm font-medium bg-white/10 px-4 py-2 rounded-lg backdrop-blur-sm">
+              <span className="rounded-lg bg-white/10 px-4 py-2 text-sm font-medium backdrop-blur-sm">
                 Sayfa {currentPage}
               </span>
               <button
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={imageError}
-                className="p-2 rounded-lg bg-white/10 text-white backdrop-blur-sm disabled:opacity-30 disabled:cursor-not-allowed hover:bg-white/20 transition-colors"
+                className="rounded-lg bg-white/10 p-2 text-white backdrop-blur-sm transition-colors hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-30"
               >
-                <svg className="w-6 h-6 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
                 </svg>
               </button>
             </div>
@@ -207,25 +146,29 @@ const BookDetailPage = () => {
         </div>
 
         {/* Kenar Kontrolleri */}
-        <div 
-          className="absolute left-0 inset-y-0 w-1/4 cursor-pointer z-10"
-          onClick={(e) => {
-            if ((e.target as HTMLElement).tagName === 'BUTTON' || 
-                (e.target as HTMLElement).closest('button') ||
-                (e.target as HTMLElement).tagName === 'svg' ||
-                (e.target as HTMLElement).tagName === 'path') {
+        <div
+          className="absolute inset-y-0 left-0 z-10 h-full w-1/6 cursor-pointer"
+          onClick={e => {
+            if (
+              (e.target as HTMLElement).tagName === 'BUTTON' ||
+              (e.target as HTMLElement).closest('button') ||
+              (e.target as HTMLElement).tagName === 'svg' ||
+              (e.target as HTMLElement).tagName === 'path'
+            ) {
               return;
             }
             if (currentPage > 1) handlePageChange(currentPage - 1);
           }}
         />
-        <div 
-          className="absolute right-0 inset-y-0 w-1/4 cursor-pointer z-10"
-          onClick={(e) => {
-            if ((e.target as HTMLElement).tagName === 'BUTTON' || 
-                (e.target as HTMLElement).closest('button') ||
-                (e.target as HTMLElement).tagName === 'svg' ||
-                (e.target as HTMLElement).tagName === 'path') {
+        <div
+          className="absolute inset-y-0 right-0 z-10 h-full w-1/6 cursor-pointer"
+          onClick={e => {
+            if (
+              (e.target as HTMLElement).tagName === 'BUTTON' ||
+              (e.target as HTMLElement).closest('button') ||
+              (e.target as HTMLElement).tagName === 'svg' ||
+              (e.target as HTMLElement).tagName === 'path'
+            ) {
               return;
             }
             if (!imageError) handlePageChange(currentPage + 1);
