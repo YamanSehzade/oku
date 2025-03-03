@@ -147,12 +147,7 @@ const BookDetailPage = () => {
 
   return (
     <div className={styles.container}>
-      <TopBar
-        book={book}
-        controlsClassName={controlsClassName}
-        onGoBack={handleGoBack}
-        currentPage={currentPage}
-      />
+      <TopBar book={book} controlsClassName={controlsClassName} onGoBack={handleGoBack} />
 
       {/* Ana İçerik */}
       <motion.div

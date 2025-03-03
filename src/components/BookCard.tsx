@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { BiHeart } from 'react-icons/bi';
 import { Link, useLocation } from 'react-router-dom';
 import { useFavorites } from '../context/FavoritesContext';
-import { Book } from '../utils/books';
+import { Book } from '../types/book';
 
 type Props = {
   book: Book;

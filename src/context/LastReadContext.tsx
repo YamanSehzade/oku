@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { getLastReadPages, saveLastReadPage } from '../helpers/localStorage.helper';
-import { Book } from '../utils/books';
+import { Book } from '../types/book';
 
 export type LastReadPage = {
   book: Book;

@@ -3,12 +3,11 @@ import { Book } from '../../../types/book';
 
 interface TopBarProps {
   book: Book;
-  controlsClassName: string;
+  controlsClassName?: string;
   onGoBack: () => void;
-  currentPage: number;
 }
 
-export const TopBar = ({ book, controlsClassName, onGoBack, currentPage }: TopBarProps) => {
+export const TopBar = ({ book, controlsClassName, onGoBack }: TopBarProps) => {
   const handlePrint = () => {
     const currentImage = document.querySelector('.BookImage img') as HTMLImageElement;
     if (!currentImage) return;

@@ -5,7 +5,7 @@ import {
   isInFavorites,
   removeFromFavorites,
 } from '../helpers/localStorage.helper';
-import { Book } from '../utils/books';
+import { Book } from '../types/book';
 
 // Context için tip tanımlaması
 type FavoritesContextType = {

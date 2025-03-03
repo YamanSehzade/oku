@@ -1,14 +1,15 @@
 import { LastReadPage } from '../context/LastReadContext';
-import { Book } from '../utils/books';
+import { Book } from '../types/book';
 
 // LocalStorage key'leri
 const STORAGE_KEYS = {
   FAVORITES: 'favorites',
+  LAST_READ: 'lastRead',
   LAST_READ_PAGES: 'lastReadPages',
 } as const;
 
 // LocalStorage'dan veri okuma
-const getItem = <T>(key: string, defaultValue: T): T => {
+export const getItem = <T>(key: string, defaultValue: T): T => {
   try {
     const item = localStorage.getItem(key);
     return item ? JSON.parse(item) : defaultValue;
@@ -18,34 +19,33 @@ const getItem = <T>(key: string, defaultValue: T): T => {
 };
 
 // LocalStorage'a veri yazma
-const setItem = <T>(key: string, value: T): void => {
+export const setItem = <T>(key: string, value: T): void => {
   try {
     localStorage.setItem(key, JSON.stringify(value));
   } catch (error) {
-    console.error('LocalStorage yazma hatası:', error);
+    console.error('Error saving to localStorage:', error);
   }
 };
 
 // Favoriler için işlemler
 export const getFavorites = (): Book[] => {
-  const favorites = localStorage.getItem(STORAGE_KEYS.FAVORITES);
-  return favorites ? JSON.parse(favorites) : [];
+  return getItem<Book[]>(STORAGE_KEYS.FAVORITES, []);
 };
 
-export const saveFavorites = (favorites: Book[]): void => {
-  localStorage.setItem(STORAGE_KEYS.FAVORITES, JSON.stringify(favorites));
+export const setFavorites = (favorites: Book[]): void => {
+  setItem(STORAGE_KEYS.FAVORITES, favorites);
 };
 
 export const addToFavorites = (book: Book): void => {
   const favorites = getFavorites();
   if (!favorites.some(f => f.link === book.link)) {
-    saveFavorites([...favorites, book]);
+    setFavorites([...favorites, book]);
   }
 };
 
 export const removeFromFavorites = (book: Book): void => {
   const favorites = getFavorites();
-  saveFavorites(favorites.filter(f => f.link !== book.link));
+  setFavorites(favorites.filter(f => f.link !== book.link));
 };
 
 export const isInFavorites = (book: Book): boolean => {
@@ -55,15 +55,7 @@ export const isInFavorites = (book: Book): boolean => {
 
 // Son okunan sayfalar için işlemler
 export const getLastReadPages = (): LastReadPage[] => {
-  const lastReadPages = localStorage.getItem(STORAGE_KEYS.LAST_READ_PAGES);
-  if (!lastReadPages) return [];
-
-  const parsed = JSON.parse(lastReadPages);
-  // Eski kayıtlar için isFinished özelliğini ekle
-  return parsed.map((page: any) => ({
-    ...page,
-    isFinished: page.isFinished ?? false,
-  }));
+  return getItem<LastReadPage[]>(STORAGE_KEYS.LAST_READ_PAGES, []);
 };
 
 export const saveLastReadPage = (lastReadPage: LastReadPage): void => {
@@ -72,10 +64,18 @@ export const saveLastReadPage = (lastReadPage: LastReadPage): void => {
     ...lastReadPages.filter(lrp => lrp.book.link !== lastReadPage.book.link),
     lastReadPage,
   ];
-  localStorage.setItem(STORAGE_KEYS.LAST_READ_PAGES, JSON.stringify(updatedLastReadPages));
+  setItem(STORAGE_KEYS.LAST_READ_PAGES, updatedLastReadPages);
 };
 
 export const getLastReadPage = (book: Book): LastReadPage | undefined => {
   const pages = getLastReadPages();
   return pages.find(p => p.book.link === book.link);
+};
+
+export const getLastRead = (): Book | null => {
+  return getItem<Book | null>(STORAGE_KEYS.LAST_READ, null);
+};
+
+export const setLastRead = (book: Book | null): void => {
+  setItem(STORAGE_KEYS.LAST_READ, book);
 };

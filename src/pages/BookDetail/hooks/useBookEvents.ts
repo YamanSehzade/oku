@@ -61,7 +61,7 @@ export const useBookEvents = ({
   );
 
   const handleDragEnd = useCallback(
-    (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
       handleInteraction('touch', info);
     },
     [handleInteraction]
