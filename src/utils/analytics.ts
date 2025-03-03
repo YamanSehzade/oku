@@ -1,4 +1,4 @@
-import { logAnalyticsEvent } from '@/config/firebase';
+import { logAnalyticsEvent } from '../config/firebase';
 
 export const AnalyticsEvents = {
   // Sayfa görüntüleme olayları

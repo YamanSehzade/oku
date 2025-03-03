@@ -1,5 +1,5 @@
-import * as analytics from '@/utils/analytics';
 import { useEffect, useRef } from 'react';
+import * as analytics from '../utils/analytics';
 
 export const useAnalytics = () => {
   const analyticsRef = useRef(analytics);

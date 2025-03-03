@@ -1,4 +1,3 @@
-import useAnalytics from '@/hooks/useAnalytics';
 import {
   BiBook,
   BiBookHeart,
@@ -11,6 +10,7 @@ import {
   BiInfoCircle,
   BiLineChart,
 } from 'react-icons/bi';
+import useAnalytics from '../hooks/useAnalytics';
 
 const AboutPage = () => {
   const currentYear = new Date().getFullYear();
