@@ -10,11 +10,9 @@ interface TopBarProps {
 
 export const TopBar = ({ book, controlsClassName, onGoBack, currentPage }: TopBarProps) => {
   const handlePrint = () => {
-    // Mevcut görüntülenen resmi bul
     const currentImage = document.querySelector('.BookImage img') as HTMLImageElement;
     if (!currentImage) return;
 
-    // Yeni pencere aç ve sadece resmi yazdır
     const printWindow = window.open('', '_blank');
     if (!printWindow) return;
 
@@ -22,8 +20,39 @@ export const TopBar = ({ book, controlsClassName, onGoBack, currentPage }: TopBa
       <html>
         <head>
           <style>
-            body { margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-            img { max-width: 100%; height: auto; }
+            @page {
+              size: auto;
+              margin: 0mm;
+            }
+            body {
+              margin: 0;
+              padding: 0;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              min-height: 100vh;
+            }
+            img {
+              width: 100vw;
+              height: 100vh;
+              object-fit: contain;
+              page-break-inside: avoid;
+            }
+            @media print {
+              body {
+                height: 100vh;
+                margin: 0;
+                padding: 0;
+              }
+              img {
+                max-width: 100%;
+                max-height: 100%;
+                width: auto;
+                height: auto;
+                margin: auto;
+                display: block;
+              }
+            }
           </style>
         </head>
         <body>
