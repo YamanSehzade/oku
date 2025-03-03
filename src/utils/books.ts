@@ -1,11 +1,4 @@
-export type Book = {
-  name: string;
-  writer: string | null;
-  publisher: string;
-  series: string | null;
-  pageCount: number;
-  link: string;
-};
+import { Book } from '../types/book';
 
 export const books: Book[] = [
   {
