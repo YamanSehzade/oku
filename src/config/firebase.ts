@@ -1,4 +1,4 @@
-import { getAnalytics, logEvent } from 'firebase/analytics';
+import { getAnalytics, logEvent, setAnalyticsCollectionEnabled } from 'firebase/analytics';
 import { initializeApp } from 'firebase/app';
 
 const firebaseConfig = {
@@ -12,11 +12,33 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-const analytics = typeof window !== 'undefined' ? getAnalytics(app) : null;
+let analytics = null;
+
+try {
+  if (typeof window !== 'undefined') {
+    analytics = getAnalytics(app);
+
+    // Analytics collection'ı sadece production ortamında aktif et
+    if (import.meta.env.DEV) {
+      // Development ortamında analytics'i devre dışı bırak
+      setAnalyticsCollectionEnabled(analytics, false);
+      window.localStorage.setItem('debug', '*');
+    } else {
+      // Production ortamında analytics'i aktif et
+      setAnalyticsCollectionEnabled(analytics, true);
+    }
+  }
+} catch (error) {
+  console.error('Analytics initialization error:', error);
+}
 
 export const logAnalyticsEvent = (eventName: string, eventParams?: Record<string, any>) => {
   if (analytics) {
-    logEvent(analytics, eventName, eventParams);
+    try {
+      logEvent(analytics, eventName, eventParams);
+    } catch (error) {
+      console.error('Analytics event logging error:', error);
+    }
   }
 };
 

@@ -1,3 +1,5 @@
+const CACHE_VERSION = 'v3'; // Sürüm arttırıldı
+
 const isLocalhost = Boolean(
   window.location.hostname === 'localhost' ||
     window.location.hostname === '[::1]' ||
@@ -32,6 +34,7 @@ function registerValidSW(swUrl: string, config?: Config) {
   navigator.serviceWorker
     .register(swUrl)
     .then(registration => {
+      console.log(`Service Worker registered with cache version: ${CACHE_VERSION}`);
       registration.onupdatefound = () => {
         const installingWorker = registration.installing;
         if (installingWorker == null) {
@@ -40,14 +43,16 @@ function registerValidSW(swUrl: string, config?: Config) {
         installingWorker.onstatechange = () => {
           if (installingWorker.state === 'installed') {
             if (navigator.serviceWorker.controller) {
+              // Yeni içerik mevcut
               console.log(
-                'New content is available and will be used when all tabs for this page are closed.'
+                `New content is available (Cache version: ${CACHE_VERSION}). It will be used when all tabs are closed.`
               );
               if (config && config.onUpdate) {
                 config.onUpdate(registration);
               }
             } else {
-              console.log('Content is cached for offline use.');
+              // Her şey cache'lendi
+              console.log(`Content is cached for offline use (Cache version: ${CACHE_VERSION}).`);
               if (config && config.onSuccess) {
                 config.onSuccess(registration);
               }
@@ -71,17 +76,21 @@ function checkValidServiceWorker(swUrl: string, config?: Config) {
         response.status === 404 ||
         (contentType != null && contentType.indexOf('javascript') === -1)
       ) {
+        // SW bulunamadı, uygulamayı yeniden yükle
         navigator.serviceWorker.ready.then(registration => {
           registration.unregister().then(() => {
             window.location.reload();
           });
         });
       } else {
+        // SW bulundu, devam et
         registerValidSW(swUrl, config);
       }
     })
     .catch(() => {
-      console.log('No internet connection found. App is running in offline mode.');
+      console.log(
+        `No internet connection found. App is running in offline mode (Cache version: ${CACHE_VERSION}).`
+      );
     });
 }
 
