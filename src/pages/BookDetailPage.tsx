@@ -1,3 +1,4 @@
+import { motion, PanInfo, useAnimation } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { books } from '../utils/books';
@@ -7,9 +8,10 @@ const BookDetailPage = () => {
   const navigate = useNavigate();
   const bookIndex = id ? parseInt(id) : -1;
   const book = bookIndex >= 0 && bookIndex < books.length ? books[bookIndex] : null;
-  const [currentPage, setCurrentPage] = useState(2);
+  const [currentPage, setCurrentPage] = useState(1);
   const [imageError, setImageError] = useState(false);
   const [showControls, setShowControls] = useState(true);
+  const controls = useAnimation();
 
   // Klavye kısa yolları için effect
   useEffect(() => {
@@ -25,10 +27,44 @@ const BookDetailPage = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [currentPage, imageError]);
 
-  const handlePageChange = (newPage: number) => {
+  const handleDragEnd = async (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    const threshold = 100;
+    const velocity = 500;
+
+    if (info.velocity.x < -velocity && !imageError) {
+      // Hızlı sola kaydırma - sonraki sayfa
+      await animatePageChange('next');
+    } else if (info.velocity.x > velocity && currentPage > 1) {
+      // Hızlı sağa kaydırma - önceki sayfa
+      await animatePageChange('prev');
+    } else if (info.offset.x < -threshold && !imageError) {
+      // Yavaş sola kaydırma - sonraki sayfa
+      await animatePageChange('next');
+    } else if (info.offset.x > threshold && currentPage > 1) {
+      // Yavaş sağa kaydırma - önceki sayfa
+      await animatePageChange('prev');
+    } else {
+      // Eşik değerini geçmeyen kaydırma - geri dön
+      controls.start({ x: 0, transition: { duration: 0.2 } });
+    }
+  };
+
+  const animatePageChange = async (direction: 'next' | 'prev') => {
+    const xOffset = direction === 'next' ? -window.innerWidth : window.innerWidth;
+    await controls.start({ x: xOffset, transition: { duration: 0.2 } });
+    setCurrentPage(prev => (direction === 'next' ? prev + 1 : prev - 1));
+    setImageError(false);
+    await controls.set({ x: -xOffset }); // Yeni sayfayı ekranın dışında konumlandır
+    await controls.start({ x: 0, transition: { duration: 0.2 } }); // Yeni sayfayı içeri kaydır
+  };
+
+  const handlePageChange = async (newPage: number) => {
     if (newPage > 0) {
-      setCurrentPage(newPage);
-      setImageError(false);
+      if (newPage > currentPage && !imageError) {
+        await animatePageChange('next');
+      } else if (newPage < currentPage) {
+        await animatePageChange('prev');
+      }
     }
   };
 
@@ -62,36 +98,46 @@ const BookDetailPage = () => {
 
   return (
     <div className="fixed inset-0 bg-black">
-      <div
-        className="flex h-full w-full items-center justify-center overflow-y-auto"
+      <motion.div
+        className="flex h-full w-full items-center justify-center overflow-hidden"
         onClick={handleScreenTap}
+        drag="x"
+        dragConstraints={{ left: 0, right: 0 }}
+        dragElastic={0.2}
+        onDragEnd={handleDragEnd}
       >
         <div className="absolute inset-0 flex items-start justify-center overflow-y-auto">
-          {imageError ? (
-            <div className="flex min-h-full flex-col items-center justify-center p-8 text-center">
-              <div className="mb-4 text-2xl font-semibold text-white">Kitap Bitti</div>
-              <div className="text-lg text-white/70">Bu kitabı okumayı tamamladınız</div>
-              <button
-                onClick={() => navigate('/')}
-                className="mt-8 rounded-lg bg-white/10 px-6 py-3 text-white backdrop-blur-sm transition-colors hover:bg-white/20"
-              >
-                Ana Sayfaya Dön
-              </button>
-            </div>
-          ) : (
-            <img
-              src={`${book.link}/${currentPage}.jpg`}
-              alt={`${book.name} - Sayfa ${currentPage}`}
-              className="min-h-full w-full select-none object-contain landscape:object-cover"
-              onError={() => {
-                setImageError(true);
-                if (currentPage > 1) {
-                  setCurrentPage(currentPage - 1);
-                }
-              }}
-              draggable={false}
-            />
-          )}
+          <motion.div
+            animate={controls}
+            className="min-h-full w-full"
+            style={{ touchAction: 'pan-y' }}
+          >
+            {imageError ? (
+              <div className="flex min-h-full flex-col items-center justify-center p-8 text-center">
+                <div className="mb-4 text-2xl font-semibold text-white">Kitap Bitti</div>
+                <div className="text-lg text-white/70">Bu kitabı okumayı tamamladınız</div>
+                <button
+                  onClick={() => navigate('/')}
+                  className="mt-8 rounded-lg bg-white/10 px-6 py-3 text-white backdrop-blur-sm transition-colors hover:bg-white/20"
+                >
+                  Ana Sayfaya Dön
+                </button>
+              </div>
+            ) : (
+              <img
+                src={`${book.link}/${currentPage}.jpg`}
+                alt={`${book.name} - Sayfa ${currentPage}`}
+                className="min-h-full w-full select-none object-contain landscape:object-cover"
+                onError={() => {
+                  setImageError(true);
+                  if (currentPage > 1) {
+                    setCurrentPage(currentPage - 1);
+                  }
+                }}
+                draggable={false}
+              />
+            )}
+          </motion.div>
         </div>
 
         {/* Alt Kontroller - Sabit Pozisyon */}
@@ -174,7 +220,7 @@ const BookDetailPage = () => {
             if (!imageError) handlePageChange(currentPage + 1);
           }}
         />
-      </div>
+      </motion.div>
     </div>
   );
 };
