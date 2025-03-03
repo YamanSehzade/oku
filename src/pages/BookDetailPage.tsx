@@ -1,5 +1,5 @@
 import { motion, PanInfo, useAnimation } from 'framer-motion';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { books } from '../utils/books';
 
@@ -8,10 +8,11 @@ const BookDetailPage = () => {
   const navigate = useNavigate();
   const bookIndex = id ? parseInt(id) : -1;
   const book = bookIndex >= 0 && bookIndex < books.length ? books[bookIndex] : null;
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(2);
   const [imageError, setImageError] = useState(false);
   const [showControls, setShowControls] = useState(true);
   const controls = useAnimation();
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // Klavye kısa yolları için effect
   useEffect(() => {
@@ -26,6 +27,12 @@ const BookDetailPage = () => {
     window.addEventListener('keydown', handleKeyDown, { passive: true });
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [currentPage, imageError]);
+
+  const scrollToTop = () => {
+    if (containerRef.current) {
+      containerRef.current.scrollTo({ top: 0, behavior: 'instant' });
+    }
+  };
 
   const handleDragEnd = async (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     const threshold = 100;
@@ -54,6 +61,7 @@ const BookDetailPage = () => {
     await controls.start({ x: xOffset, transition: { duration: 0.2 } });
     setCurrentPage(prev => (direction === 'next' ? prev + 1 : prev - 1));
     setImageError(false);
+    scrollToTop();
     await controls.set({ x: -xOffset }); // Yeni sayfayı ekranın dışında konumlandır
     await controls.start({ x: 0, transition: { duration: 0.2 } }); // Yeni sayfayı içeri kaydır
   };
@@ -106,7 +114,10 @@ const BookDetailPage = () => {
         dragElastic={0.2}
         onDragEnd={handleDragEnd}
       >
-        <div className="absolute inset-0 flex items-start justify-center overflow-y-auto">
+        <div
+          ref={containerRef}
+          className="absolute inset-0 flex items-start justify-center overflow-y-auto scroll-smooth"
+        >
           <motion.div
             animate={controls}
             className="min-h-full w-full"
