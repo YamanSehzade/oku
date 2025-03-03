@@ -12,76 +12,54 @@ export const TopBar = ({ book, controlsClassName, onGoBack }: TopBarProps) => {
     const currentImage = document.querySelector('.BookImage img') as HTMLImageElement;
     if (!currentImage) return;
 
-    const printWindow = window.open('', '_blank');
-    if (!printWindow) return;
+    // iOS için basit bir çözüm
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
 
-    printWindow.document.write(`
-      <html>
-        <head>
-          <title>${book.name}</title>
-          <style>
-            * {
-              margin: 0;
-              padding: 0;
-              box-sizing: border-box;
-            }
-            @page {
-              size: auto;
-              margin: 10mm;
-            }
-            html, body {
-              height: 100%;
-              width: 100%;
-            }
-            body {
-              display: flex;
-              justify-content: center;
-              align-items: center;
-              min-height: 100%;
-            }
-            .print-container {
-              display: flex;
-              justify-content: center;
-              align-items: center;
-              width: 100%;
-              height: 100%;
-            }
-            img {
-              max-width: 100%;
-              max-height: 100%;
-              object-fit: contain;
-              display: block;
-            }
-            @media print {
-              html, body {
-                height: 100%;
-                width: 100%;
+    if (isIOS) {
+      const printWindow = window.open(currentImage.src, '_blank');
+      if (printWindow) {
+        printWindow.focus();
+      }
+    } else {
+      // Diğer tarayıcılar için iframe çözümü
+      const iframe = document.createElement('iframe');
+      iframe.style.display = 'none';
+      document.body.appendChild(iframe);
+
+      const printDocument = iframe.contentWindow?.document;
+      if (!printDocument) return;
+
+      printDocument.write(`
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <title>${book.name}</title>
+            <style>
+              body {
                 margin: 0;
-                padding: 0;
-              }
-              .print-container {
-                break-inside: avoid;
-                page-break-after: avoid;
-                page-break-before: avoid;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                min-height: 100vh;
               }
               img {
                 max-width: 100%;
-                max-height: 100%;
+                max-height: 100vh;
+                object-fit: contain;
               }
-            }
-          </style>
-        </head>
-        <body>
-          <div class="print-container">
-            <img 
-              src="${currentImage.src}" 
-              onload="setTimeout(() => { window.print(); window.close(); }, 500);" 
-            />
-          </div>
-        </body>
-      </html>
-    `);
-    printWindow.document.close();
+            </style>
+          </head>
+          <body>
+            <img src="${currentImage.src}" onload="window.focus(); window.print(); window.close();" />
+          </body>
+        </html>
+      `);
+      printDocument.close();
+
+      setTimeout(() => {
+        document.body.removeChild(iframe);
+      }, 1000);
+    }
   };
 
   return (
