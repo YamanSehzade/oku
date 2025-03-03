@@ -58,7 +58,9 @@ const Header = ({ activeTab, setActiveTab, isMenuOpen, setIsMenuOpen }: Props) =
               className="inline-flex items-center justify-center rounded-md p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-600 focus:outline-none"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
-              <BiMenuAltRight className="h-7 w-7" />
+              <BiMenuAltRight
+                className={`h-7 w-7 transform transition-transform duration-300 ${isMenuOpen ? 'rotate-180' : ''}`}
+              />
             </button>
           </div>
 
@@ -87,7 +89,11 @@ const Header = ({ activeTab, setActiveTab, isMenuOpen, setIsMenuOpen }: Props) =
         </div>
 
         {/* Mobil Menü */}
-        <div className={`sm:hidden ${isMenuOpen ? 'block' : 'hidden'}`}>
+        <div
+          className={`transform overflow-hidden transition-all duration-300 ease-in-out sm:hidden ${
+            isMenuOpen ? 'max-h-48 opacity-100' : 'max-h-0 opacity-0'
+          }`}
+        >
           <div className="space-y-1 pb-3 pt-2">
             {tabs.map(tab => (
               <Link
@@ -97,7 +103,7 @@ const Header = ({ activeTab, setActiveTab, isMenuOpen, setIsMenuOpen }: Props) =
                   activeTab === tab.id
                     ? 'border-primary-500 bg-primary-50 text-primary-700'
                     : 'border-transparent text-gray-500 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700'
-                } block border-l-4 py-2 pl-3 pr-4 text-base font-medium transition-colors duration-200`}
+                } block border-l-4 py-2 pl-3 pr-4 text-base font-medium transition-all duration-200`}
                 onClick={() => {
                   setActiveTab(tab.id);
                   setIsMenuOpen(false);
