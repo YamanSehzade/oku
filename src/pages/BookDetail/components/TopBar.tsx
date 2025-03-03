@@ -65,7 +65,7 @@ export const TopBar = ({ book, controlsClassName, onGoBack, currentPage }: TopBa
 
   return (
     <div
-      className={`${controlsClassName} top-0 mx-2 mt-4 rounded-2xl bg-black/70 px-3 py-2 backdrop-blur-sm sm:mx-4 sm:px-4`}
+      className={`${controlsClassName} top-0 mx-2 mt-4 rounded-2xl bg-black/50 px-3 py-2 backdrop-blur-sm sm:mx-4 sm:px-4`}
     >
       <div className="flex items-center justify-between text-white">
         <button

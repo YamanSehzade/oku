@@ -20,7 +20,7 @@ export const BottomBar = ({
 }: BottomBarProps) => {
   return (
     <div
-      className={`${controlsClassName} bottom-0 mx-2 mb-4 rounded-2xl bg-black/70 px-3 py-2 backdrop-blur-sm sm:mx-4 sm:px-4`}
+      className={`${controlsClassName} bottom-0 mx-2 mb-4 rounded-2xl bg-black/50 px-3 py-2 backdrop-blur-sm sm:mx-4 sm:px-4`}
     >
       <div className="flex flex-col space-y-2 text-white sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
         <div className="text-xs sm:text-sm">
