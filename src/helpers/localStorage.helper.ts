@@ -3,11 +3,11 @@ import { Book } from '../utils/books';
 // LocalStorage key'leri
 const STORAGE_KEYS = {
   FAVORITES: 'favorites',
-  BOOKMARKS: 'bookmarks',
+  LAST_READ: 'lastRead',
 } as const;
 
-// Yer imi tipi
-type Bookmark = {
+// Son okunan sayfa tipi
+type LastReadPage = {
   book: Book;
   page: number;
   lastReadAt: string;
@@ -58,45 +58,35 @@ export const isInFavorites = (book: Book): boolean => {
   return favorites.some(f => f.link === book.link);
 };
 
-// Yer imleri için işlemler
-export const getBookmarks = (): Bookmark[] => {
-  return getItem<Bookmark[]>(STORAGE_KEYS.BOOKMARKS, []);
+// Son okunan sayfalar için işlemler
+export const getLastReadPages = (): LastReadPage[] => {
+  return getItem<LastReadPage[]>(STORAGE_KEYS.LAST_READ, []);
 };
 
-export const setBookmarks = (bookmarks: Bookmark[]): void => {
-  setItem(STORAGE_KEYS.BOOKMARKS, bookmarks);
+export const setLastReadPages = (pages: LastReadPage[]): void => {
+  setItem(STORAGE_KEYS.LAST_READ, pages);
 };
 
-export const addOrUpdateBookmark = (book: Book, page: number): void => {
-  const bookmarks = getBookmarks();
-  const existingIndex = bookmarks.findIndex(b => b.book.link === book.link);
+export const saveLastReadPage = (book: Book, page: number): void => {
+  const pages = getLastReadPages();
+  const existingIndex = pages.findIndex(p => p.book.link === book.link);
 
-  const newBookmark: Bookmark = {
+  const newPage: LastReadPage = {
     book,
     page,
     lastReadAt: new Date().toISOString(),
   };
 
   if (existingIndex !== -1) {
-    bookmarks[existingIndex] = newBookmark;
+    pages[existingIndex] = newPage;
   } else {
-    bookmarks.push(newBookmark);
+    pages.push(newPage);
   }
 
-  setBookmarks(bookmarks);
+  setLastReadPages(pages);
 };
 
-export const removeBookmark = (book: Book): void => {
-  const bookmarks = getBookmarks();
-  setBookmarks(bookmarks.filter(b => b.book.link !== book.link));
-};
-
-export const getBookmark = (book: Book): Bookmark | undefined => {
-  const bookmarks = getBookmarks();
-  return bookmarks.find(b => b.book.link === book.link);
-};
-
-export const isBookmarked = (book: Book): boolean => {
-  const bookmarks = getBookmarks();
-  return bookmarks.some(b => b.book.link === book.link);
+export const getLastReadPage = (book: Book): LastReadPage | undefined => {
+  const pages = getLastReadPages();
+  return pages.find(p => p.book.link === book.link);
 };

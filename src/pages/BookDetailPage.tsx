@@ -1,15 +1,15 @@
 import { motion, PanInfo, useAnimation } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
-import { BiArrowBack, BiBookmark } from 'react-icons/bi';
+import { BiArrowBack } from 'react-icons/bi';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { useBookmarks } from '../context/BookmarksContext';
+import { useLastRead } from '../context/LastReadContext';
 import { books } from '../utils/books';
 
 const BookDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const location = useLocation();
-  const { isBookmarked, addBookmark, removeBookmark } = useBookmarks();
+  const { getLastPage, saveLastPage } = useLastRead();
 
   // URL'den gelen id'yi decode et ve kitabı bul
   const decodedId = id ? decodeURIComponent(id) : '';
@@ -20,11 +20,23 @@ const BookDetailPage = () => {
     return bookId === decodedId;
   });
 
-  const [currentPage, setCurrentPage] = useState(2);
+  // Kitabın son okunan sayfasını al veya 1'den başla
+  const [currentPage, setCurrentPage] = useState(() => {
+    if (!book) return 1;
+    return getLastPage(book);
+  });
+
   const [imageError, setImageError] = useState(false);
   const [showControls, setShowControls] = useState(true);
   const controls = useAnimation();
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Sayfa değiştiğinde otomatik kaydet
+  useEffect(() => {
+    if (book) {
+      saveLastPage(book, currentPage);
+    }
+  }, [book, currentPage, saveLastPage]);
 
   // Klavye kısa yolları için effect
   useEffect(() => {
@@ -101,16 +113,6 @@ const BookDetailPage = () => {
     setShowControls(!showControls);
   };
 
-  const handleBookmarkClick = () => {
-    if (!book) return;
-
-    if (isBookmarked(book)) {
-      removeBookmark(book);
-    } else {
-      addBookmark(book, currentPage);
-    }
-  };
-
   if (!book) {
     return (
       <div className="flex h-screen items-center justify-center">
@@ -144,17 +146,7 @@ const BookDetailPage = () => {
             Geri
           </button>
           <div className="flex items-center">
-            <h1 className="mr-4 text-lg font-medium">{book.name}</h1>
-            <button
-              onClick={handleBookmarkClick}
-              className={`rounded-full p-2 ${
-                isBookmarked(book)
-                  ? 'bg-accent-500/20 text-accent-400'
-                  : 'bg-white/10 text-white/70 hover:bg-white/20'
-              }`}
-            >
-              <BiBookmark className="h-6 w-6" />
-            </button>
+            <h1 className="text-lg font-medium">{book.name}</h1>
           </div>
         </div>
       </div>

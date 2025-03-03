@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Route, BrowserRouter as Router, Routes, useLocation } from 'react-router-dom';
 import './App.css';
-import { BookmarksProvider } from './context/BookmarksContext';
 import { FavoritesProvider } from './context/FavoritesContext';
+import { LastReadProvider } from './context/LastReadContext';
 
 // Bileşen importları
 import Header from './components/Header';
@@ -57,9 +57,9 @@ const App = () => {
   return (
     <Router>
       <FavoritesProvider>
-        <BookmarksProvider>
+        <LastReadProvider>
           <AppContent />
-        </BookmarksProvider>
+        </LastReadProvider>
       </FavoritesProvider>
     </Router>
   );
