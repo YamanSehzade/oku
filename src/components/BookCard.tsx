@@ -1,17 +1,24 @@
 import React, { useState } from 'react';
-import { Book } from '../utils/books';
+import { BiHeart } from 'react-icons/bi';
 import { Link } from 'react-router-dom';
 import { useFavorites } from '../context/FavoritesContext';
+import { Book } from '../utils/books';
 
 type Props = {
   book: Book;
   index: number;
 };
 
-const BookCard: React.FC<Props> = ({ book, index }) => {
+const BookCard: React.FC<Props> = ({ book }) => {
   const [imageError, setImageError] = useState(false);
   const { isFavorite, addFavorite, removeFavorite } = useFavorites();
   const favorite = isFavorite(book);
+
+  // Kitabın link'inden id'yi çıkar
+  const getBookId = () => {
+    const urlParts = book.link.split('/');
+    return urlParts[urlParts.length - 1];
+  };
 
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -24,7 +31,7 @@ const BookCard: React.FC<Props> = ({ book, index }) => {
 
   return (
     <Link
-      to={`/kitap/${index}`}
+      to={`/kitap/${getBookId()}`}
       className="group relative block aspect-[3/4] overflow-hidden rounded-2xl shadow-lg transition-all duration-300 hover:shadow-2xl"
     >
       {/* Arka Plan Resmi */}
@@ -41,25 +48,10 @@ const BookCard: React.FC<Props> = ({ book, index }) => {
 
       {/* Favori Butonu */}
       <button
-        onClick={e => {
-          e.preventDefault();
-          handleFavoriteClick(e);
-        }}
+        onClick={handleFavoriteClick}
         className="absolute right-3 top-3 z-10 rounded-full bg-black/20 p-2.5 backdrop-blur-sm transition-all duration-300 hover:bg-black/40"
       >
-        <svg
-          className={`h-5 w-5 ${favorite ? 'text-red-500' : 'text-white'}`}
-          fill={favorite ? 'currentColor' : 'none'}
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-          />
-        </svg>
+        <BiHeart className={`h-5 w-5 ${favorite ? 'text-red-500' : 'text-white'}`} />
       </button>
 
       {/* İçerik */}

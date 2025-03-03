@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { Book } from '../utils/books';
 
 // Context için tip tanımlaması
@@ -30,7 +30,12 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
 
   // Favori kitap ekleme
   const addFavorite = (book: Book) => {
-    setFavorites(prev => [...prev, book]);
+    setFavorites(prev => {
+      if (!prev.some(b => b.link === book.link)) {
+        return [...prev, book];
+      }
+      return prev;
+    });
   };
 
   // Favori kitap çıkarma

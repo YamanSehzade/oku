@@ -5,6 +5,7 @@ import { FavoritesProvider } from './context/FavoritesContext';
 
 // Bileşen importları
 import Header from './components/Header';
+import BookDetailPage from './pages/BookDetailPage';
 import BookshelfPage from './pages/BookshelfPage';
 import LibraryPage from './pages/LibraryPage';
 import ProfilePage from './pages/ProfilePage';
@@ -21,7 +22,7 @@ const App = () => {
   return (
     <Router>
       <FavoritesProvider>
-        <div className="bg-primary-50 min-h-screen">
+        <div className="min-h-screen bg-primary-50">
           {/* Header Bileşeni */}
           <Header
             activeTab={activeTab}
@@ -36,6 +37,7 @@ const App = () => {
               <Route path="/" element={<LibraryPage />} />
               <Route path="/kitaplik" element={<BookshelfPage />} />
               <Route path="/hakkimda" element={<ProfilePage />} />
+              <Route path="/kitap/:id" element={<BookDetailPage />} />
             </Routes>
           </main>
         </div>

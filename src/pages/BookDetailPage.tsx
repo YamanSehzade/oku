@@ -1,16 +1,26 @@
 import { motion, PanInfo, useAnimation } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
+import { BiArrowBack, BiBookmark } from 'react-icons/bi';
 import { useNavigate, useParams } from 'react-router-dom';
 import { books } from '../utils/books';
 
 const BookDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const bookIndex = id ? parseInt(id) : -1;
-  const book = bookIndex >= 0 && bookIndex < books.length ? books[bookIndex] : null;
+
+  // URL'den gelen id'yi decode et ve kitabı bul
+  const decodedId = id ? decodeURIComponent(id) : '';
+  const book = books.find(b => {
+    // URL'den gelen id, kitabın link'inin son kısmı olacak
+    const urlParts = b.link.split('/');
+    const bookId = urlParts[urlParts.length - 1];
+    return bookId === decodedId;
+  });
+
   const [currentPage, setCurrentPage] = useState(2);
   const [imageError, setImageError] = useState(false);
   const [showControls, setShowControls] = useState(true);
+  const [isBookmarked, setIsBookmarked] = useState(false); // TODO: Context'ten gelecek
   const controls = useAnimation();
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -39,19 +49,14 @@ const BookDetailPage = () => {
     const velocity = 500;
 
     if (info.velocity.x < -velocity && !imageError) {
-      // Hızlı sola kaydırma - sonraki sayfa
       await animatePageChange('next');
     } else if (info.velocity.x > velocity && currentPage > 1) {
-      // Hızlı sağa kaydırma - önceki sayfa
       await animatePageChange('prev');
     } else if (info.offset.x < -threshold && !imageError) {
-      // Yavaş sola kaydırma - sonraki sayfa
       await animatePageChange('next');
     } else if (info.offset.x > threshold && currentPage > 1) {
-      // Yavaş sağa kaydırma - önceki sayfa
       await animatePageChange('prev');
     } else {
-      // Eşik değerini geçmeyen kaydırma - geri dön
       controls.start({ x: 0, transition: { duration: 0.2 } });
     }
   };
@@ -62,8 +67,8 @@ const BookDetailPage = () => {
     setCurrentPage(prev => (direction === 'next' ? prev + 1 : prev - 1));
     setImageError(false);
     scrollToTop();
-    await controls.set({ x: -xOffset }); // Yeni sayfayı ekranın dışında konumlandır
-    await controls.start({ x: 0, transition: { duration: 0.2 } }); // Yeni sayfayı içeri kaydır
+    await controls.set({ x: -xOffset });
+    await controls.start({ x: 0, transition: { duration: 0.2 } });
   };
 
   const handlePageChange = async (newPage: number) => {
@@ -88,6 +93,10 @@ const BookDetailPage = () => {
     setShowControls(!showControls);
   };
 
+  const handleBookmarkClick = () => {
+    setIsBookmarked(!isBookmarked); // TODO: Context'e taşınacak
+  };
+
   if (!book) {
     return (
       <div className="flex h-screen items-center justify-center">
@@ -95,7 +104,7 @@ const BookDetailPage = () => {
           <h2 className="mb-4 text-2xl font-bold text-gray-900">Kitap bulunamadı</h2>
           <button
             onClick={() => navigate('/')}
-            className="rounded-lg bg-blue-600 px-6 py-2 text-white transition-colors hover:bg-blue-700"
+            className="rounded-lg bg-secondary-600 px-6 py-2 text-white transition-colors hover:bg-secondary-700"
           >
             Ana Sayfaya Dön
           </button>
@@ -106,6 +115,36 @@ const BookDetailPage = () => {
 
   return (
     <div className="fixed inset-0 bg-black">
+      {/* Üst Bar */}
+      <div
+        className={`fixed inset-x-0 top-0 z-50 bg-gradient-to-b from-black/70 to-transparent px-4 py-2 transition-opacity duration-300 ${
+          showControls ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'
+        }`}
+      >
+        <div className="flex items-center justify-between text-white">
+          <button
+            onClick={() => navigate('/')}
+            className="flex items-center rounded-lg bg-white/10 px-4 py-2 text-sm font-medium backdrop-blur-sm transition-opacity hover:bg-white/20"
+          >
+            <BiArrowBack className="mr-2 h-5 w-5" />
+            Geri
+          </button>
+          <div className="flex items-center">
+            <h1 className="mr-4 text-lg font-medium">{book.name}</h1>
+            <button
+              onClick={handleBookmarkClick}
+              className={`rounded-full p-2 ${
+                isBookmarked
+                  ? 'bg-accent-500/20 text-accent-400'
+                  : 'bg-white/10 text-white/70 hover:bg-white/20'
+              }`}
+            >
+              <BiBookmark className="h-6 w-6" />
+            </button>
+          </div>
+        </div>
+      </div>
+
       <motion.div
         className="flex h-full w-full items-center justify-center overflow-hidden"
         onClick={handleScreenTap}
@@ -151,21 +190,17 @@ const BookDetailPage = () => {
           </motion.div>
         </div>
 
-        {/* Alt Kontroller - Sabit Pozisyon */}
+        {/* Alt Kontroller */}
         <div
           className={`fixed inset-x-0 bottom-0 z-50 m-4 rounded-xl bg-gradient-to-b from-black/70 to-transparent px-4 py-2 transition-opacity duration-300 ${
             showControls ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'
           }`}
         >
           <div className="flex items-center justify-between text-white">
-            <button
-              onClick={() => {
-                navigate('/');
-              }}
-              className="rounded-lg bg-white/10 px-4 py-2 text-sm font-medium backdrop-blur-sm transition-opacity hover:bg-white/20 hover:opacity-100"
-            >
-              Ana Sayfa
-            </button>
+            <div className="text-sm">
+              {book.writer && <div className="font-medium">{book.writer}</div>}
+              <div className="text-white/70">{book.publisher}</div>
+            </div>
             <div className="flex items-center gap-8">
               <button
                 onClick={() => handlePageChange(currentPage - 1)}
@@ -182,7 +217,7 @@ const BookDetailPage = () => {
                 </svg>
               </button>
               <span className="rounded-lg bg-white/10 px-4 py-2 text-sm font-medium backdrop-blur-sm">
-                Sayfa {currentPage}
+                Sayfa {currentPage} / {book.pageCount}
               </span>
               <button
                 onClick={() => handlePageChange(currentPage + 1)}
