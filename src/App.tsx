@@ -27,6 +27,8 @@ const AppContent = () => {
       setActiveTab('kutuphane');
     } else if (path === '/kitaplik') {
       setActiveTab('kitaplik');
+    } else if (path === '/hakkinda') {
+      setActiveTab('hakkinda');
     }
   }, [location.pathname]);
 
