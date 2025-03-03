@@ -13,6 +13,7 @@ type FavoritesContextType = {
   addFavorite: (book: Book) => void;
   removeFavorite: (book: Book) => void;
   isFavorite: (book: Book) => boolean;
+  toggleFavorite: (book: Book) => void;
 };
 
 // Context'i oluştur
@@ -41,8 +42,18 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     return isInFavorites(book);
   };
 
+  const toggleFavorite = (book: Book) => {
+    if (isFavorite(book)) {
+      removeFavorite(book);
+    } else {
+      addFavorite(book);
+    }
+  };
+
   return (
-    <FavoritesContext.Provider value={{ favorites, addFavorite, removeFavorite, isFavorite }}>
+    <FavoritesContext.Provider
+      value={{ favorites, addFavorite, removeFavorite, isFavorite, toggleFavorite }}
+    >
       {children}
     </FavoritesContext.Provider>
   );

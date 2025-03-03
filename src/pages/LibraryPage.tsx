@@ -1,13 +1,38 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { BiBookOpen, BiError, BiFilterAlt, BiSearch } from 'react-icons/bi';
+import 'react-lazy-load-image-component/src/effects/blur.css';
 import BookCard from '../components/BookCard';
 import { books } from '../utils/books';
+
+// Sayfa başına gösterilecek kitap sayısı
+const BOOKS_PER_PAGE = 50;
 
 /**
  * Kütüphane sayfası - Tüm kitapların listelendiği ana sayfa
  */
 const LibraryPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const observer = useRef<IntersectionObserver>();
+  const lastBookElementRef = useCallback(
+    (node: HTMLDivElement) => {
+      if (loading) return;
+      if (observer.current) observer.current.disconnect();
+      observer.current = new IntersectionObserver(entries => {
+        if (entries[0].isIntersecting && hasMore) {
+          setLoading(true);
+          setTimeout(() => {
+            setPage(prevPage => prevPage + 1);
+            setLoading(false);
+          }, 100); // Yükleme animasyonunu görebilmek için kısa bir gecikme
+        }
+      });
+      if (node) observer.current.observe(node);
+    },
+    [loading, hasMore]
+  );
 
   // Türkçe karakterleri İngilizce karakterlere dönüştür
   const turkishToEnglish = (text: string): string => {
@@ -65,6 +90,18 @@ const LibraryPage = () => {
     return searchWords.every(searchWord => bookFieldsText.includes(searchWord));
   });
 
+  // Filtrelenmiş ve sayfalanmış kitaplar
+  const paginatedBooks = filteredBooks.slice(0, page * BOOKS_PER_PAGE);
+
+  useEffect(() => {
+    setHasMore(paginatedBooks.length < filteredBooks.length);
+  }, [paginatedBooks.length, filteredBooks.length]);
+
+  useEffect(() => {
+    // Arama yapıldığında sayfayı sıfırla
+    setPage(1);
+  }, [searchTerm]);
+
   return (
     <div className="space-y-6">
       {/* Sayfa Başlığı */}
@@ -103,10 +140,22 @@ const LibraryPage = () => {
 
       {/* Kitap Listesi */}
       <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-        {filteredBooks.map((book, index) => (
-          <BookCard key={book.link} book={book} index={index} />
+        {paginatedBooks.map((book, index) => (
+          <div
+            key={book.link}
+            ref={index === paginatedBooks.length - 1 ? lastBookElementRef : undefined}
+          >
+            <BookCard book={book} index={index} />
+          </div>
         ))}
       </div>
+
+      {/* Yükleniyor */}
+      {loading && (
+        <div className="flex justify-center py-4">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary-500 border-t-transparent"></div>
+        </div>
+      )}
 
       {/* Sonuç Bulunamadı */}
       {filteredBooks.length === 0 && (
