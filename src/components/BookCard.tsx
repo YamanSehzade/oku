@@ -16,6 +16,18 @@ const BookCard: React.FC<Props> = ({ book, lastReadPage }) => {
   const favorite = isFavorite(book);
   const location = useLocation();
 
+  // Kitap başlığını düzenle
+  const getFormattedTitle = () => {
+    if (book.series && book.name.includes(book.series)) {
+      // Seri adını başlıktan çıkar ve kalan metni temizle
+      return book.name
+        .replace(book.series, '')
+        .replace(/^[-\s]*/, '') // Baştaki tire ve boşlukları temizle
+        .replace(/^[0-9]+[-\s]*/, ''); // Baştaki sayı ve tire/boşlukları temizle
+    }
+    return book.name;
+  };
+
   // Kitabın link'inden id'yi çıkar
   const getBookId = () => {
     const urlParts = book.link.split('/');
@@ -35,7 +47,7 @@ const BookCard: React.FC<Props> = ({ book, lastReadPage }) => {
     <Link
       to={`/kitap/${getBookId()}`}
       state={{ from: location.pathname }}
-      className="group relative block aspect-[3/4] overflow-hidden rounded-lg bg-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+      className="group relative block aspect-[3/4] overflow-hidden rounded-xl bg-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
     >
       {/* Arka Plan Resmi */}
       <div
@@ -52,23 +64,23 @@ const BookCard: React.FC<Props> = ({ book, lastReadPage }) => {
       {/* Favori Butonu */}
       <button
         onClick={handleFavoriteClick}
-        className={`absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full backdrop-blur-sm transition-all duration-300 ${
+        className={`absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full backdrop-blur-sm transition-all duration-300 ${
           favorite
             ? 'bg-red-500/90 text-white hover:bg-red-600'
             : 'bg-black/20 text-white hover:bg-black/40'
         }`}
       >
         <BiHeart
-          className={`h-5 w-5 transform transition-transform duration-300 ${
+          className={`h-6 w-6 transform transition-transform duration-300 ${
             favorite ? 'scale-110' : 'scale-100 group-hover:scale-110'
           }`}
         />
       </button>
 
       {/* Sayfa Bilgisi */}
-      <div className="absolute left-3 top-3 z-10">
+      <div className="absolute left-4 top-4 z-10">
         <div
-          className={`rounded-md px-2.5 py-1 text-xs font-medium backdrop-blur-sm transition-colors duration-300 ${
+          className={`rounded-lg px-3 py-1.5 text-sm font-medium backdrop-blur-sm transition-colors duration-300 ${
             lastReadPage ? 'bg-primary-500/90 text-white' : 'bg-black/20 text-white'
           }`}
         >
@@ -77,21 +89,21 @@ const BookCard: React.FC<Props> = ({ book, lastReadPage }) => {
       </div>
 
       {/* İçerik */}
-      <div className="absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-black via-black/90 to-transparent p-4">
+      <div className="absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-black via-black/90 to-transparent p-5">
         <div className="flex flex-grow flex-col justify-between">
           <div>
-            <h3 className="font-book mb-2 text-lg font-semibold text-white group-hover:text-primary-200">
-              {book.name}
+            <h3 className="font-book mb-3 text-xl font-semibold text-white group-hover:text-primary-200">
+              {getFormattedTitle()}
             </h3>
           </div>
-          <div className="space-y-1.5">
+          <div className="space-y-2">
             {book.writer && (
-              <p className="line-clamp-1 text-sm font-medium text-white/95">{book.writer}</p>
+              <p className="line-clamp-1 text-base font-medium text-white/95">{book.writer}</p>
             )}
-            <div className="flex flex-col gap-0.5">
-              <p className="line-clamp-1 text-xs font-medium text-white/80">{book.publisher}</p>
+            <div className="flex flex-col gap-1">
+              <p className="line-clamp-1 text-sm font-medium text-white/80">{book.publisher}</p>
               {book.series && (
-                <p className="line-clamp-1 text-xs font-medium text-white/80">{book.series}</p>
+                <p className="line-clamp-1 text-sm font-medium text-white/80">{book.series}</p>
               )}
             </div>
           </div>
