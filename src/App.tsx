@@ -1,8 +1,8 @@
-import "./App.css";
-import LibraryPage from "./pages/LibraryPage";
-import BookDetailPage from "./pages/BookDetailPage";
-import { FavoritesProvider } from "./context/FavoritesContext";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import './App.css';
+import LibraryPage from './pages/LibraryPage';
+import BookDetailPage from './pages/BookDetailPage';
+import { FavoritesProvider } from './context/FavoritesContext';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 function App() {
   return (

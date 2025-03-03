@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Book } from "../utils/books";
-import { Link } from "react-router-dom";
+import { Book } from '../utils/books';
+import { Link } from 'react-router-dom';
 import { useFavorites } from '../context/FavoritesContext';
 
 type Props = {
@@ -25,30 +25,30 @@ const BookCard: React.FC<Props> = ({ book, index }) => {
   return (
     <Link
       to={`/kitap/${index}`}
-      className="group relative block aspect-[3/4] rounded-2xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-2xl"
+      className="group relative block aspect-[3/4] overflow-hidden rounded-2xl shadow-lg transition-all duration-300 hover:shadow-2xl"
     >
       {/* Arka Plan Resmi */}
-      <div 
-        className="absolute inset-0 bg-cover bg-center transform transition-transform duration-300 group-hover:scale-110"
+      <div
+        className="absolute inset-0 transform bg-cover bg-center transition-transform duration-300 group-hover:scale-110"
         style={{
-          backgroundImage: `url(${imageError ? `${book.link}/2.jpg` : `${book.link}/1.jpg`})`
+          backgroundImage: `url(${imageError ? `${book.link}/2.jpg` : `${book.link}/1.jpg`})`,
         }}
         onError={() => setImageError(true)}
       />
 
       {/* Karartma Katmanı */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-300" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-60 transition-opacity duration-300 group-hover:opacity-80" />
 
       {/* Favori Butonu */}
       <button
-        onClick={(e) => {
+        onClick={e => {
           e.preventDefault();
           handleFavoriteClick(e);
         }}
-        className="absolute top-3 right-3 z-10 p-2.5 rounded-full bg-black/20 hover:bg-black/40 backdrop-blur-sm transition-all duration-300"
+        className="absolute right-3 top-3 z-10 rounded-full bg-black/20 p-2.5 backdrop-blur-sm transition-all duration-300 hover:bg-black/40"
       >
         <svg
-          className={`w-5 h-5 ${favorite ? 'text-red-500' : 'text-white'}`}
+          className={`h-5 w-5 ${favorite ? 'text-red-500' : 'text-white'}`}
           fill={favorite ? 'currentColor' : 'none'}
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -64,18 +64,12 @@ const BookCard: React.FC<Props> = ({ book, index }) => {
 
       {/* İçerik */}
       <div className="absolute inset-x-0 bottom-0 p-4 text-white">
-        <h3 className="text-lg font-bold mb-1 line-clamp-2">
-          {book.name}
-        </h3>
-        
+        <h3 className="mb-1 line-clamp-2 text-lg font-bold">{book.name}</h3>
+
         <div className="space-y-0.5 text-sm opacity-90">
-          {book.writer && (
-            <p className="line-clamp-1">{book.writer}</p>
-          )}
-          <p className="text-xs opacity-75 line-clamp-1">{book.publisher}</p>
-          {book.series && (
-            <p className="text-xs opacity-75 line-clamp-1">{book.series}</p>
-          )}
+          {book.writer && <p className="line-clamp-1">{book.writer}</p>}
+          <p className="line-clamp-1 text-xs opacity-75">{book.publisher}</p>
+          {book.series && <p className="line-clamp-1 text-xs opacity-75">{book.series}</p>}
         </div>
       </div>
     </Link>

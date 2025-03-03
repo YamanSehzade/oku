@@ -57,4 +57,4 @@ export function useFavorites() {
     throw new Error('useFavorites must be used within a FavoritesProvider');
   }
   return context;
-} 
+}
