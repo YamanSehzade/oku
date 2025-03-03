@@ -66,8 +66,20 @@ const BookCard: React.FC<Props> = ({ book }) => {
 
       {/* İçerik */}
       <div className="absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-black p-4">
-        <h3 className="mb-1 text-sm font-semibold text-white sm:text-base">{book.name}</h3>
-        {book.writer && <p className="text-xs text-white/80 sm:text-sm">{book.writer}</p>}
+        <h3 className="mb-2 line-clamp-2 text-sm font-semibold text-white sm:text-base">
+          {book.name}
+        </h3>
+        <div className="space-y-1">
+          {book.writer && (
+            <p className="line-clamp-1 text-xs font-medium text-white/90 sm:text-sm">
+              {book.writer}
+            </p>
+          )}
+          <div className="flex flex-col space-y-0.5">
+            <p className="line-clamp-1 text-xs text-white/70">{book.publisher}</p>
+            {book.series && <p className="line-clamp-1 text-xs text-white/70">{book.series}</p>}
+          </div>
+        </div>
       </div>
     </Link>
   );

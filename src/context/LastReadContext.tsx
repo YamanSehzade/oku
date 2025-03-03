@@ -1,21 +1,17 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import {
-  getLastReadPage,
-  getLastReadPages,
-  saveLastReadPage,
-} from '../helpers/localStorage.helper';
+import { getLastReadPages, saveLastReadPage } from '../helpers/localStorage.helper';
 import { Book } from '../utils/books';
 
-type LastReadPage = {
+export type LastReadPage = {
   book: Book;
   page: number;
-  lastReadAt: string;
+  timestamp: number;
 };
 
 type LastReadContextType = {
   lastReadPages: LastReadPage[];
-  saveLastPage: (book: Book, page: number) => void;
-  getLastPage: (book: Book) => number;
+  saveLastRead: (book: Book, page: number) => void;
+  getLastRead: (book: Book) => number | undefined;
 };
 
 const LastReadContext = createContext<LastReadContextType | undefined>(undefined);
@@ -25,25 +21,34 @@ export const LastReadProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   // İlk yüklemede son okunan sayfaları localStorage'dan al
   useEffect(() => {
-    setLastReadPages(getLastReadPages());
+    const storedLastReadPages = getLastReadPages();
+    setLastReadPages(storedLastReadPages);
   }, []);
 
-  const handleSaveLastPage = (book: Book, page: number) => {
-    saveLastReadPage(book, page);
-    setLastReadPages(getLastReadPages());
+  const saveLastRead = (book: Book, page: number) => {
+    const newLastRead: LastReadPage = {
+      book,
+      page,
+      timestamp: Date.now(),
+    };
+
+    saveLastReadPage(newLastRead);
+    setLastReadPages(prev => {
+      const filtered = prev.filter(lrp => lrp.book.link !== book.link);
+      return [...filtered, newLastRead];
+    });
   };
 
-  const handleGetLastPage = (book: Book): number => {
-    const lastRead = getLastReadPage(book);
-    return lastRead?.page || 1;
+  const getLastRead = (book: Book): number | undefined => {
+    return lastReadPages.find(lrp => lrp.book.link === book.link)?.page;
   };
 
   return (
     <LastReadContext.Provider
       value={{
         lastReadPages,
-        saveLastPage: handleSaveLastPage,
-        getLastPage: handleGetLastPage,
+        saveLastRead,
+        getLastRead,
       }}
     >
       {children}

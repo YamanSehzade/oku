@@ -9,7 +9,7 @@ const BookDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const location = useLocation();
-  const { getLastPage, saveLastPage } = useLastRead();
+  const { getLastRead, saveLastRead } = useLastRead();
 
   // URL'den gelen id'yi decode et ve kitabı bul
   const decodedId = id ? decodeURIComponent(id) : '';
@@ -23,7 +23,7 @@ const BookDetailPage = () => {
   // Kitabın son okunan sayfasını al veya 1'den başla
   const [currentPage, setCurrentPage] = useState(() => {
     if (!book) return 1;
-    return getLastPage(book);
+    return getLastRead(book) || 1;
   });
 
   const [imageError, setImageError] = useState(false);
@@ -34,9 +34,9 @@ const BookDetailPage = () => {
   // Sayfa değiştiğinde otomatik kaydet
   useEffect(() => {
     if (book) {
-      saveLastPage(book, currentPage);
+      saveLastRead(book, currentPage);
     }
-  }, [book, currentPage, saveLastPage]);
+  }, [book, currentPage, saveLastRead]);
 
   // Klavye kısa yolları için effect
   useEffect(() => {

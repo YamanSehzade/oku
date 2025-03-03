@@ -1,17 +1,11 @@
+import { LastReadPage } from '../context/LastReadContext';
 import { Book } from '../utils/books';
 
 // LocalStorage key'leri
 const STORAGE_KEYS = {
   FAVORITES: 'favorites',
-  LAST_READ: 'lastRead',
+  LAST_READ_PAGES: 'lastReadPages',
 } as const;
-
-// Son okunan sayfa tipi
-type LastReadPage = {
-  book: Book;
-  page: number;
-  lastReadAt: string;
-};
 
 // LocalStorage'dan veri okuma
 const getItem = <T>(key: string, defaultValue: T): T => {
@@ -34,23 +28,24 @@ const setItem = <T>(key: string, value: T): void => {
 
 // Favoriler için işlemler
 export const getFavorites = (): Book[] => {
-  return getItem<Book[]>(STORAGE_KEYS.FAVORITES, []);
+  const favorites = localStorage.getItem(STORAGE_KEYS.FAVORITES);
+  return favorites ? JSON.parse(favorites) : [];
 };
 
-export const setFavorites = (favorites: Book[]): void => {
-  setItem(STORAGE_KEYS.FAVORITES, favorites);
+export const saveFavorites = (favorites: Book[]): void => {
+  localStorage.setItem(STORAGE_KEYS.FAVORITES, JSON.stringify(favorites));
 };
 
 export const addToFavorites = (book: Book): void => {
   const favorites = getFavorites();
   if (!favorites.some(f => f.link === book.link)) {
-    setFavorites([...favorites, book]);
+    saveFavorites([...favorites, book]);
   }
 };
 
 export const removeFromFavorites = (book: Book): void => {
   const favorites = getFavorites();
-  setFavorites(favorites.filter(f => f.link !== book.link));
+  saveFavorites(favorites.filter(f => f.link !== book.link));
 };
 
 export const isInFavorites = (book: Book): boolean => {
@@ -60,30 +55,17 @@ export const isInFavorites = (book: Book): boolean => {
 
 // Son okunan sayfalar için işlemler
 export const getLastReadPages = (): LastReadPage[] => {
-  return getItem<LastReadPage[]>(STORAGE_KEYS.LAST_READ, []);
+  const lastReadPages = localStorage.getItem(STORAGE_KEYS.LAST_READ_PAGES);
+  return lastReadPages ? JSON.parse(lastReadPages) : [];
 };
 
-export const setLastReadPages = (pages: LastReadPage[]): void => {
-  setItem(STORAGE_KEYS.LAST_READ, pages);
-};
-
-export const saveLastReadPage = (book: Book, page: number): void => {
-  const pages = getLastReadPages();
-  const existingIndex = pages.findIndex(p => p.book.link === book.link);
-
-  const newPage: LastReadPage = {
-    book,
-    page,
-    lastReadAt: new Date().toISOString(),
-  };
-
-  if (existingIndex !== -1) {
-    pages[existingIndex] = newPage;
-  } else {
-    pages.push(newPage);
-  }
-
-  setLastReadPages(pages);
+export const saveLastReadPage = (lastReadPage: LastReadPage): void => {
+  const lastReadPages = getLastReadPages();
+  const updatedLastReadPages = [
+    ...lastReadPages.filter(lrp => lrp.book.link !== lastReadPage.book.link),
+    lastReadPage,
+  ];
+  localStorage.setItem(STORAGE_KEYS.LAST_READ_PAGES, JSON.stringify(updatedLastReadPages));
 };
 
 export const getLastReadPage = (book: Book): LastReadPage | undefined => {
