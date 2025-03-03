@@ -11,6 +11,7 @@ import { TopBar } from './components/TopBar';
 import { SWIPE_CONF, useBookAnimation } from './hooks/useBookAnimation';
 import { useBookEvents } from './hooks/useBookEvents';
 import { useBookImage } from './hooks/useBookImage';
+import { styles } from './styles';
 
 const BookDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -110,15 +111,11 @@ const BookDetailPage = () => {
 
   // Kontrol sınıfları
   const controlsClassName = useMemo(() => {
-    return `fixed inset-x-0 z-50 transition-opacity duration-300 ${
-      showControls ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'
-    }`;
+    return `${styles.controls.base} ${showControls ? styles.controls.visible : styles.controls.hidden}`;
   }, [showControls]);
 
   // Buton sınıfları
-  const buttonClassName = useMemo(() => {
-    return 'rounded-lg bg-white/10 p-2 text-white backdrop-blur-sm transition-colors hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-30';
-  }, []);
+  const buttonClassName = useMemo(() => styles.controls.button, []);
 
   const handleGoBack = useCallback(() => {
     const previousPath = location.state?.from || '/';
@@ -137,13 +134,10 @@ const BookDetailPage = () => {
 
   if (!book) {
     return (
-      <div className="flex h-screen items-center justify-center">
-        <div className="text-center">
-          <h2 className="mb-4 text-2xl font-bold text-gray-900">Kitap bulunamadı</h2>
-          <button
-            onClick={handleGoBack}
-            className="rounded-lg bg-secondary-600 px-6 py-2 text-white transition-colors hover:bg-secondary-700"
-          >
+      <div className={styles.error.container}>
+        <div className={styles.error.content}>
+          <h2 className={styles.error.title}>Kitap bulunamadı</h2>
+          <button onClick={handleGoBack} className={styles.error.button}>
             Geri Dön
           </button>
         </div>
@@ -152,12 +146,12 @@ const BookDetailPage = () => {
   }
 
   return (
-    <div className="fixed inset-0 bg-black">
+    <div className={styles.container}>
       <TopBar book={book} controlsClassName={controlsClassName} onGoBack={handleGoBack} />
 
       {/* Ana İçerik */}
       <motion.div
-        className="flex h-full w-full items-center justify-center overflow-hidden"
+        className={styles.content.wrapper}
         onClick={handleScreenTap}
         drag="x"
         dragConstraints={{ left: 0, right: 0 }}
@@ -167,21 +161,11 @@ const BookDetailPage = () => {
         layoutId="page-container"
         style={{ touchAction: 'none' }}
       >
-        <div
-          ref={containerRef}
-          className="absolute inset-0 flex items-start justify-center overflow-y-auto scroll-smooth"
-        >
+        <div ref={containerRef} className={styles.content.container}>
           <motion.div
             animate={controls}
-            className="min-h-full w-full"
-            style={{
-              touchAction: 'pan-y',
-              willChange: 'transform',
-              backfaceVisibility: 'hidden',
-              WebkitBackfaceVisibility: 'hidden',
-              perspective: 1000,
-              WebkitPerspective: 1000,
-            }}
+            className={styles.content.imageContainer}
+            style={styles.motion.base}
           >
             <BookImage
               book={book}

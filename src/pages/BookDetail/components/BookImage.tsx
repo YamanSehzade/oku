@@ -1,4 +1,5 @@
 import { Book } from '../../../types/book';
+import { styles } from '../styles';
 
 interface BookImageProps {
   book: Book;
@@ -19,15 +20,14 @@ export const BookImage = ({
 }: BookImageProps) => {
   if (imageError) {
     return (
-      <div className="flex min-h-full flex-col items-center justify-center p-8 text-center">
-        <div className="mb-4 text-2xl font-semibold text-white">Kitap Bitti</div>
-        <div className="text-lg text-white/70">Bu kitabı okumayı tamamladınız</div>
-        <button
-          onClick={onGoBack}
-          className="mt-8 rounded-lg bg-white/10 px-6 py-3 text-white backdrop-blur-sm transition-colors hover:bg-white/20"
-        >
-          Geri Dön
-        </button>
+      <div className={styles.error.container}>
+        <div className={styles.error.content}>
+          <div className="mb-4 text-2xl font-semibold text-white">Kitap Bitti</div>
+          <div className="text-lg text-white/70">Bu kitabı okumayı tamamladınız</div>
+          <button onClick={onGoBack} className={styles.error.button}>
+            Geri Dön
+          </button>
+        </div>
       </div>
     );
   }
@@ -36,7 +36,7 @@ export const BookImage = ({
     <img
       src={currentImageUrl}
       alt={`${book.name} - Sayfa ${currentPage}`}
-      className="min-h-full w-full select-none object-contain landscape:object-cover"
+      className={`${styles.image.base} ${styles.image.responsive}`}
       onError={onError}
       draggable={false}
     />
