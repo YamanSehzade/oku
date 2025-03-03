@@ -12,7 +12,7 @@ const BookshelfPage = () => {
   const { lastReadPages } = useLastRead();
   const { favorites } = useFavorites();
 
-  // Son okunan kitapları tarihe göre sırala
+  // Son okunan kitapları tarihe göre sırala ve son 5 kitabı al
   const recentlyReadBooks = useMemo(() => {
     return books
       .filter(book => lastReadPages.some(lrp => lrp.book.link === book.link))
@@ -20,7 +20,8 @@ const BookshelfPage = () => {
         const aDate = lastReadPages.find(lrp => lrp.book.link === a.link)?.timestamp || 0;
         const bDate = lastReadPages.find(lrp => lrp.book.link === b.link)?.timestamp || 0;
         return bDate - aDate;
-      });
+      })
+      .slice(0, 5); // Son 5 kitabı al
   }, [lastReadPages]);
 
   return (
@@ -44,9 +45,14 @@ const BookshelfPage = () => {
             <BiHistory className="mr-2 h-5 w-5" />
             Son Okunan Kitaplar
           </h3>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
             {recentlyReadBooks.map((book, index) => (
-              <BookCard key={book.link} book={book} index={index} />
+              <BookCard
+                key={book.link}
+                book={book}
+                index={index}
+                lastReadPage={lastReadPages.find(lrp => lrp.book.link === book.link)?.page}
+              />
             ))}
           </div>
         </section>
@@ -59,7 +65,7 @@ const BookshelfPage = () => {
             <BiHeart className="mr-2 h-5 w-5" />
             Favori Kitaplar
           </h3>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
             {favorites.map((book, index) => (
               <BookCard key={book.link} book={book} index={index} />
             ))}

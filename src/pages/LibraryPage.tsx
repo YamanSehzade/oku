@@ -22,7 +22,7 @@ const LibraryPage = () => {
       </div>
 
       {/* Kitap Listesi */}
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
         {books.map((book, index) => (
           <BookCard key={book.link} book={book} index={index} />
         ))}
