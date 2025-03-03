@@ -34,9 +34,9 @@ const BookDetailPage = () => {
   // Sayfa değiştiğinde otomatik kaydet
   useEffect(() => {
     if (book) {
-      saveLastRead(book, currentPage);
+      saveLastRead(book, currentPage, imageError);
     }
-  }, [book, currentPage, saveLastRead]);
+  }, [book, currentPage, imageError, saveLastRead]);
 
   // Klavye kısa yolları için effect
   useEffect(() => {

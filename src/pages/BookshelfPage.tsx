@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { BiHeart, BiHistory } from 'react-icons/bi';
+import { BiBookmark, BiHeart, BiHistory } from 'react-icons/bi';
 import BookCard from '../components/BookCard';
 import { useFavorites } from '../context/FavoritesContext';
 import { useLastRead } from '../context/LastReadContext';
@@ -15,13 +15,30 @@ const BookshelfPage = () => {
   // Son okunan kitapları tarihe göre sırala ve son 5 kitabı al
   const recentlyReadBooks = useMemo(() => {
     return books
-      .filter(book => lastReadPages.some(lrp => lrp.book.link === book.link))
+      .filter(book => {
+        const lastRead = lastReadPages.find(lrp => lrp.book.link === book.link);
+        return lastRead && !lastRead.isFinished;
+      })
       .sort((a, b) => {
         const aDate = lastReadPages.find(lrp => lrp.book.link === a.link)?.timestamp || 0;
         const bDate = lastReadPages.find(lrp => lrp.book.link === b.link)?.timestamp || 0;
         return bDate - aDate;
       })
       .slice(0, 5); // Son 5 kitabı al
+  }, [lastReadPages]);
+
+  // Biten kitapları tarihe göre sırala
+  const finishedBooks = useMemo(() => {
+    return books
+      .filter(book => {
+        const lastRead = lastReadPages.find(lrp => lrp.book.link === book.link);
+        return lastRead?.isFinished;
+      })
+      .sort((a, b) => {
+        const aDate = lastReadPages.find(lrp => lrp.book.link === a.link)?.timestamp || 0;
+        const bDate = lastReadPages.find(lrp => lrp.book.link === b.link)?.timestamp || 0;
+        return bDate - aDate;
+      });
   }, [lastReadPages]);
 
   return (
@@ -73,8 +90,28 @@ const BookshelfPage = () => {
         </section>
       )}
 
+      {/* Biten Kitaplar */}
+      {finishedBooks.length > 0 && (
+        <section className="space-y-4">
+          <h3 className="flex items-center text-lg font-semibold text-gray-900">
+            <BiBookmark className="mr-2 h-5 w-5" />
+            Biten Kitaplar
+          </h3>
+          <div className="grid gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+            {finishedBooks.map((book, index) => (
+              <BookCard
+                key={book.link}
+                book={book}
+                index={index}
+                lastReadPage={lastReadPages.find(lrp => lrp.book.link === book.link)?.page}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Boş Durum */}
-      {recentlyReadBooks.length === 0 && favorites.length === 0 && (
+      {recentlyReadBooks.length === 0 && favorites.length === 0 && finishedBooks.length === 0 && (
         <div className="text-center text-gray-500">
           <p>Henüz kitaplığınızda kitap bulunmuyor.</p>
           <p>Kitap okumaya başlayın veya favori kitaplarınızı ekleyin.</p>

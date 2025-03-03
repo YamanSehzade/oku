@@ -56,7 +56,14 @@ export const isInFavorites = (book: Book): boolean => {
 // Son okunan sayfalar için işlemler
 export const getLastReadPages = (): LastReadPage[] => {
   const lastReadPages = localStorage.getItem(STORAGE_KEYS.LAST_READ_PAGES);
-  return lastReadPages ? JSON.parse(lastReadPages) : [];
+  if (!lastReadPages) return [];
+
+  const parsed = JSON.parse(lastReadPages);
+  // Eski kayıtlar için isFinished özelliğini ekle
+  return parsed.map((page: any) => ({
+    ...page,
+    isFinished: page.isFinished ?? false,
+  }));
 };
 
 export const saveLastReadPage = (lastReadPage: LastReadPage): void => {

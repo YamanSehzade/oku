@@ -6,12 +6,14 @@ export type LastReadPage = {
   book: Book;
   page: number;
   timestamp: number;
+  isFinished: boolean;
 };
 
 type LastReadContextType = {
   lastReadPages: LastReadPage[];
-  saveLastRead: (book: Book, page: number) => void;
+  saveLastRead: (book: Book, page: number, isFinished?: boolean) => void;
   getLastRead: (book: Book) => number | undefined;
+  isBookFinished: (book: Book) => boolean;
 };
 
 const LastReadContext = createContext<LastReadContextType | undefined>(undefined);
@@ -25,11 +27,12 @@ export const LastReadProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setLastReadPages(storedLastReadPages);
   }, []);
 
-  const saveLastRead = (book: Book, page: number) => {
+  const saveLastRead = (book: Book, page: number, isFinished = false) => {
     const newLastRead: LastReadPage = {
       book,
       page,
       timestamp: Date.now(),
+      isFinished,
     };
 
     saveLastReadPage(newLastRead);
@@ -43,12 +46,17 @@ export const LastReadProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     return lastReadPages.find(lrp => lrp.book.link === book.link)?.page;
   };
 
+  const isBookFinished = (book: Book): boolean => {
+    return lastReadPages.find(lrp => lrp.book.link === book.link)?.isFinished || false;
+  };
+
   return (
     <LastReadContext.Provider
       value={{
         lastReadPages,
         saveLastRead,
         getLastRead,
+        isBookFinished,
       }}
     >
       {children}

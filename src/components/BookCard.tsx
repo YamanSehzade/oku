@@ -65,12 +65,19 @@ const BookCard: React.FC<Props> = ({ book, lastReadPage }) => {
         />
       </button>
 
-      {/* Son Okunan Sayfa Göstergesi */}
-      {lastReadPage && (
-        <div className="absolute left-2 top-2 z-10 rounded-md bg-primary-500 px-2 py-1 text-xs font-medium text-white shadow-lg">
-          Sayfa {lastReadPage}
-        </div>
-      )}
+      {/* Sayfa Bilgisi */}
+      <div className="absolute left-2 top-2 z-10 flex flex-col gap-1">
+        {lastReadPage && (
+          <div className="rounded-md bg-primary-500 px-2 py-1 text-xs font-medium text-white shadow-lg">
+            {lastReadPage} / {book.pageCount}
+          </div>
+        )}
+        {!lastReadPage && (
+          <div className="rounded-md bg-white/90 px-2 py-1 text-xs font-medium text-gray-600 shadow-lg">
+            {book.pageCount} sayfa
+          </div>
+        )}
+      </div>
 
       {/* İçerik */}
       <div className="absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-black p-3">
