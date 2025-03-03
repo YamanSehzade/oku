@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import './App.css';
+import { BookmarksProvider } from './context/BookmarksContext';
 import { FavoritesProvider } from './context/FavoritesContext';
 
 // Bileşen importları
@@ -22,25 +23,27 @@ const App = () => {
   return (
     <Router>
       <FavoritesProvider>
-        <div className="min-h-screen bg-primary-50">
-          {/* Header Bileşeni */}
-          <Header
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-            isMenuOpen={isMenuOpen}
-            setIsMenuOpen={setIsMenuOpen}
-          />
+        <BookmarksProvider>
+          <div className="min-h-screen bg-primary-50">
+            {/* Header Bileşeni */}
+            <Header
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+              isMenuOpen={isMenuOpen}
+              setIsMenuOpen={setIsMenuOpen}
+            />
 
-          {/* Ana İçerik */}
-          <main className="mx-auto max-w-7xl p-4 sm:px-6 lg:px-8">
-            <Routes>
-              <Route path="/" element={<LibraryPage />} />
-              <Route path="/kitaplik" element={<BookshelfPage />} />
-              <Route path="/hakkimda" element={<ProfilePage />} />
-              <Route path="/kitap/:id" element={<BookDetailPage />} />
-            </Routes>
-          </main>
-        </div>
+            {/* Ana İçerik */}
+            <main className="mx-auto max-w-7xl p-4 sm:px-6 lg:px-8">
+              <Routes>
+                <Route path="/" element={<LibraryPage />} />
+                <Route path="/kitaplik" element={<BookshelfPage />} />
+                <Route path="/hakkimda" element={<ProfilePage />} />
+                <Route path="/kitap/:id" element={<BookDetailPage />} />
+              </Routes>
+            </main>
+          </div>
+        </BookmarksProvider>
       </FavoritesProvider>
     </Router>
   );

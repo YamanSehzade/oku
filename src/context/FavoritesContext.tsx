@@ -1,51 +1,44 @@
-import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import {
+  addToFavorites,
+  getFavorites,
+  isInFavorites,
+  removeFromFavorites,
+} from '../helpers/localStorage.helper';
 import { Book } from '../utils/books';
 
 // Context için tip tanımlaması
-interface FavoritesContextType {
+type FavoritesContextType = {
   favorites: Book[];
   addFavorite: (book: Book) => void;
   removeFavorite: (book: Book) => void;
   isFavorite: (book: Book) => boolean;
-}
+};
 
 // Context'i oluştur
 const FavoritesContext = createContext<FavoritesContextType | undefined>(undefined);
 
-// Local Storage key
-const STORAGE_KEY = 'favorites';
-
 // Provider bileşeni
-export function FavoritesProvider({ children }: { children: ReactNode }) {
-  const [favorites, setFavorites] = useState<Book[]>(() => {
-    // Local storage'dan favori kitapları yükle
-    const savedFavorites = localStorage.getItem(STORAGE_KEY);
-    return savedFavorites ? JSON.parse(savedFavorites) : [];
-  });
+export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [favorites, setFavorites] = useState<Book[]>([]);
 
-  // Favoriler değiştiğinde local storage'ı güncelle
+  // İlk yüklemede favorileri localStorage'dan al
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(favorites));
-  }, [favorites]);
+    setFavorites(getFavorites());
+  }, []);
 
-  // Favori kitap ekleme
   const addFavorite = (book: Book) => {
-    setFavorites(prev => {
-      if (!prev.some(b => b.link === book.link)) {
-        return [...prev, book];
-      }
-      return prev;
-    });
+    addToFavorites(book);
+    setFavorites(getFavorites());
   };
 
-  // Favori kitap çıkarma
   const removeFavorite = (book: Book) => {
-    setFavorites(prev => prev.filter(b => b.link !== book.link));
+    removeFromFavorites(book);
+    setFavorites(getFavorites());
   };
 
-  // Kitabın favori olup olmadığını kontrol etme
   const isFavorite = (book: Book) => {
-    return favorites.some(b => b.link === book.link);
+    return isInFavorites(book);
   };
 
   return (
@@ -53,13 +46,13 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
       {children}
     </FavoritesContext.Provider>
   );
-}
+};
 
 // Custom hook
-export function useFavorites() {
+export const useFavorites = () => {
   const context = useContext(FavoritesContext);
   if (context === undefined) {
-    throw new Error('useFavorites must be used within a FavoritesProvider');
+    throw new Error('useFavorites hook must be used within a FavoritesProvider');
   }
   return context;
-}
+};
