@@ -1,4 +1,5 @@
 import { motion, PanInfo, useAnimation } from 'framer-motion';
+import debounce from 'lodash/debounce';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { BiArrowBack } from 'react-icons/bi';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
@@ -86,24 +87,15 @@ const BookDetailPage = () => {
     return () => clearTimeout(saveTimeout);
   }, [book, currentPage, imageError]);
 
-  // Klavye kısa yolları için effect
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowRight' && !imageError) {
-        handlePageChange(currentPage + 1);
-      } else if (e.key === 'ArrowLeft' && currentPage > 1) {
-        handlePageChange(currentPage - 1);
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown, { passive: true });
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentPage, imageError]);
-
-  const handleGoBack = useCallback(() => {
-    const previousPath = location.state?.from || '/';
-    navigate(previousPath);
-  }, [location.state, navigate]);
+  // Ortak element kontrolü için yardımcı fonksiyon
+  const isClickableElement = useCallback((target: HTMLElement) => {
+    return (
+      target.tagName === 'BUTTON' ||
+      target.closest('button') ||
+      target.tagName === 'svg' ||
+      target.tagName === 'path'
+    );
+  }, []);
 
   const scrollToTop = useCallback(() => {
     if (containerRef.current) {
@@ -111,15 +103,36 @@ const BookDetailPage = () => {
     }
   }, []);
 
+  // Gesture kontrolü için sabitler
+  const SWIPE_CONF = {
+    threshold: 100,
+    velocity: 500,
+    dragElastic: 0.2,
+    animationDuration: 0.2,
+    transition: {
+      type: 'tween',
+      ease: 'easeOut',
+      duration: 0.2,
+      stiffness: 300,
+      damping: 30,
+    },
+  } as const;
+
   const animatePageChange = useCallback(
     async (direction: 'next' | 'prev') => {
       const xOffset = direction === 'next' ? -window.innerWidth : window.innerWidth;
-      await controls.start({ x: xOffset, transition: { duration: 0.2 } });
+      await controls.start({
+        x: xOffset,
+        transition: SWIPE_CONF.transition,
+      });
       setCurrentPage(prev => (direction === 'next' ? prev + 1 : prev - 1));
       setImageError(false);
       scrollToTop();
       await controls.set({ x: -xOffset });
-      await controls.start({ x: 0, transition: { duration: 0.2 } });
+      await controls.start({
+        x: 0,
+        transition: SWIPE_CONF.transition,
+      });
     },
     [controls, scrollToTop]
   );
@@ -137,71 +150,90 @@ const BookDetailPage = () => {
     [currentPage, imageError, animatePageChange]
   );
 
-  // Ortak element kontrolü için yardımcı fonksiyon
-  const isClickableElement = useCallback((target: HTMLElement) => {
-    return (
-      target.tagName === 'BUTTON' ||
-      target.closest('button') ||
-      target.tagName === 'svg' ||
-      target.tagName === 'path'
-    );
-  }, []);
+  // Event yönetimi için merkezi fonksiyon
+  const handleInteraction = useCallback(
+    (type: 'keyboard' | 'touch' | 'click', e: any) => {
+      // Tıklama kontrolü
+      if (type === 'click' && isClickableElement(e.target as HTMLElement)) {
+        return;
+      }
 
-  // Kenar kontrolü için yardımcı fonksiyon
+      // Klavye kontrolü
+      if (type === 'keyboard') {
+        const key = (e as KeyboardEvent).key;
+        if (key === 'ArrowRight' && !imageError) {
+          handlePageChange(currentPage + 1);
+        } else if (key === 'ArrowLeft' && currentPage > 1) {
+          handlePageChange(currentPage - 1);
+        }
+        return;
+      }
+
+      // Dokunma kontrolü
+      if (type === 'touch') {
+        const info = e as PanInfo;
+        const { velocity, threshold } = SWIPE_CONF;
+        const canGoNext = !imageError;
+        const canGoPrev = currentPage > 1;
+
+        if (info.velocity.x < -velocity && canGoNext) {
+          animatePageChange('next');
+        } else if (info.velocity.x > velocity && canGoPrev) {
+          animatePageChange('prev');
+        } else if (info.offset.x < -threshold && canGoNext) {
+          animatePageChange('next');
+        } else if (info.offset.x > threshold && canGoPrev) {
+          animatePageChange('prev');
+        } else {
+          controls.start({ x: 0, transition: { duration: SWIPE_CONF.animationDuration } });
+        }
+      }
+    },
+    [currentPage, imageError, handlePageChange, animatePageChange, controls, isClickableElement]
+  );
+
+  // Klavye event listener'ı
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => handleInteraction('keyboard', e);
+    window.addEventListener('keydown', handleKeyDown, { passive: true });
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleInteraction]);
+
+  // Drag end handler'ı
+  const handleDragEnd = useCallback(
+    (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+      handleInteraction('touch', info);
+    },
+    [handleInteraction]
+  );
+
+  // Edge control handler'ı
   const handleEdgeControl = useCallback(
     (direction: 'prev' | 'next', e: React.MouseEvent) => {
       if (isClickableElement(e.target as HTMLElement)) return;
 
-      // Event'in yayılmasını engelle
       e.preventDefault();
       e.stopPropagation();
 
-      if (direction === 'prev' && currentPage > 1) {
-        handlePageChange(currentPage - 1);
-      } else if (direction === 'next' && !imageError) {
-        handlePageChange(currentPage + 1);
-      }
+      handlePageChange(direction === 'next' ? currentPage + 1 : currentPage - 1);
     },
-    [currentPage, imageError, handlePageChange, isClickableElement]
+    [currentPage, handlePageChange, isClickableElement]
   );
 
-  const handleScreenTap = useCallback(
-    (e: React.MouseEvent) => {
-      if (isClickableElement(e.target as HTMLElement)) return;
-      setShowControls(!showControls);
-    },
-    [showControls, isClickableElement]
+  // Screen tap handler'ı - debounce eklenmiş
+  const handleScreenTap = useMemo(
+    () =>
+      debounce((e: React.MouseEvent) => {
+        if (isClickableElement(e.target as HTMLElement)) return;
+        setShowControls(prev => !prev);
+      }, 100),
+    [isClickableElement]
   );
 
-  // Gesture kontrolü için sabitler
-  const SWIPE_CONF = {
-    threshold: 100,
-    velocity: 500,
-    dragElastic: 0.2,
-    animationDuration: 0.2,
-  } as const;
-
-  const handleDragEnd = useCallback(
-    async (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-      const { velocity, threshold } = SWIPE_CONF;
-
-      const canGoNext = !imageError;
-      const canGoPrev = currentPage > 1;
-
-      if (info.velocity.x < -velocity && canGoNext) {
-        await animatePageChange('next');
-      } else if (info.velocity.x > velocity && canGoPrev) {
-        await animatePageChange('prev');
-      } else if (info.offset.x < -threshold && canGoNext) {
-        await animatePageChange('next');
-      } else if (info.offset.x > threshold && canGoPrev) {
-        await animatePageChange('prev');
-      } else {
-        controls.start({ x: 0, transition: { duration: SWIPE_CONF.animationDuration } });
-      }
-    },
-    [animatePageChange, controls, currentPage, imageError]
-  );
+  const handleGoBack = useCallback(() => {
+    const previousPath = location.state?.from || '/';
+    navigate(previousPath);
+  }, [location.state, navigate]);
 
   if (!book) {
     return (
@@ -247,6 +279,9 @@ const BookDetailPage = () => {
         dragConstraints={{ left: 0, right: 0 }}
         dragElastic={SWIPE_CONF.dragElastic}
         onDragEnd={handleDragEnd}
+        initial={false}
+        layoutId="page-container"
+        style={{ touchAction: 'none' }}
       >
         <div
           ref={containerRef}
@@ -255,7 +290,14 @@ const BookDetailPage = () => {
           <motion.div
             animate={controls}
             className="min-h-full w-full"
-            style={{ touchAction: 'pan-y' }}
+            style={{
+              touchAction: 'pan-y',
+              willChange: 'transform',
+              backfaceVisibility: 'hidden',
+              WebkitBackfaceVisibility: 'hidden',
+              perspective: 1000,
+              WebkitPerspective: 1000,
+            }}
           >
             {imageError ? (
               <div className="flex min-h-full flex-col items-center justify-center p-8 text-center">
