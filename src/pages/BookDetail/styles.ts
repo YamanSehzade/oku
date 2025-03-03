@@ -3,9 +3,9 @@ export const styles = {
 
   // Ana içerik stilleri
   content: {
-    wrapper: 'flex h-full w-full items-center justify-center overflow-hidden',
-    container: 'absolute inset-0 flex items-start justify-center overflow-y-auto scroll-smooth',
-    imageContainer: 'min-h-full w-full',
+    wrapper: 'h-full w-full',
+    container: 'h-full w-full overflow-y-auto overscroll-none -webkit-overflow-scrolling-touch',
+    imageContainer: 'w-full',
   },
 
   // Kontrol stilleri
@@ -28,8 +28,8 @@ export const styles = {
 
   // Görsel stilleri
   image: {
-    base: 'min-h-full w-full select-none',
-    responsive: 'object-contain landscape:object-cover',
+    base: 'w-full',
+    responsive: 'object-contain',
   },
 
   // Motion div stilleri
@@ -41,6 +41,7 @@ export const styles = {
       WebkitBackfaceVisibility: 'hidden',
       perspective: 1000,
       WebkitPerspective: 1000,
+      WebkitOverflowScrolling: 'touch',
     },
   },
 } as const;

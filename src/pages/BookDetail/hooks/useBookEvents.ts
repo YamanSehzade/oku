@@ -62,9 +62,35 @@ export const useBookEvents = ({
 
   const handleDragEnd = useCallback(
     (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-      handleInteraction('touch', info);
+      const xMovement = Math.abs(info.offset.x);
+      const yMovement = Math.abs(info.offset.y);
+      const dragAngle = Math.atan2(yMovement, xMovement) * (180 / Math.PI);
+      const velocity = Math.abs(info.velocity.x);
+
+      // 45 dereceden daha dik bir açıysa dikey scroll olarak kabul et
+      if (dragAngle > 45) {
+        controls.start({ x: 0, transition: { duration: SWIPE_CONF.animationDuration } });
+        return;
+      }
+
+      const threshold = window.innerWidth * 0.15; // Eşik değerini %15'e düşürdük
+      const canGoNext = !imageError;
+      const canGoPrev = currentPage > 1;
+
+      // Hız veya mesafe yeterliyse sayfa değiştir
+      if (xMovement > threshold || velocity > SWIPE_CONF.velocity) {
+        if (info.offset.x > 0 && canGoPrev) {
+          handlePageChange(currentPage - 1);
+        } else if (info.offset.x < 0 && canGoNext) {
+          handlePageChange(currentPage + 1);
+        } else {
+          controls.start({ x: 0, transition: { duration: SWIPE_CONF.animationDuration } });
+        }
+      } else {
+        controls.start({ x: 0, transition: { duration: SWIPE_CONF.animationDuration } });
+      }
     },
-    [handleInteraction]
+    [currentPage, imageError, handlePageChange, controls]
   );
 
   const handleEdgeControl = useCallback(
@@ -74,9 +100,13 @@ export const useBookEvents = ({
       e.preventDefault();
       e.stopPropagation();
 
-      handlePageChange(direction === 'next' ? currentPage + 1 : currentPage - 1);
+      if (direction === 'next' && !imageError) {
+        handlePageChange(currentPage + 1);
+      } else if (direction === 'prev' && currentPage > 1) {
+        handlePageChange(currentPage - 1);
+      }
     },
-    [currentPage, handlePageChange, isClickableElement]
+    [currentPage, imageError, handlePageChange, isClickableElement]
   );
 
   return {

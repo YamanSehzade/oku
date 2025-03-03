@@ -8,9 +8,9 @@ interface UseBookAnimationProps {
 }
 
 export const SWIPE_CONF = {
-  threshold: 100,
-  velocity: 500,
-  dragElastic: 0.2,
+  threshold: 50,
+  velocity: 300,
+  dragElastic: 0.3,
   animationDuration: 0.2,
   transition: {
     type: 'tween',

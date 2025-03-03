@@ -33,11 +33,11 @@ export const BookImage = ({
   }
 
   return (
-    <div className="BookImage">
+    <div className="min-h-[100vh] w-full">
       <img
         src={currentImageUrl}
         alt={`${book.name} - Sayfa ${currentPage}`}
-        className={`${styles.image.base} ${styles.image.responsive}`}
+        className={`${styles.image.base} ${styles.image.responsive} h-auto`}
         onError={onError}
         draggable={false}
       />

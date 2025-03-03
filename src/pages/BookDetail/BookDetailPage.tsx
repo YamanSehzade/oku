@@ -154,18 +154,21 @@ const BookDetailPage = () => {
         className={styles.content.wrapper}
         onClick={handleScreenTap}
         drag="x"
+        dragDirectionLock
+        dragMomentum={false}
         dragConstraints={{ left: 0, right: 0 }}
         dragElastic={SWIPE_CONF.dragElastic}
         onDragEnd={handleDragEnd}
         initial={false}
         layoutId="page-container"
-        style={{ touchAction: 'none' }}
+        style={{ touchAction: 'pan-y' }}
       >
         <div ref={containerRef} className={styles.content.container}>
           <motion.div
             animate={controls}
             className={styles.content.imageContainer}
-            style={styles.motion.base}
+            style={{ ...styles.motion.base }}
+            drag={false}
           >
             <BookImage
               book={book}
