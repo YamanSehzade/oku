@@ -65,17 +65,93 @@
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
     <script>
+      let deferredPrompt;
+      let isUpdatePending = false;
+
+      // PWA yükleme promptunu yakala
+      window.addEventListener('beforeinstallprompt', e => {
+        e.preventDefault();
+        deferredPrompt = e;
+      });
+
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker
             .register('/sw.js')
             .then(registration => {
-              console.log('Service Worker başarıyla kaydedildi:', registration);
+              console.log('Service Worker başarıyla kaydedildi');
+
+              // Yeni bir service worker yüklendiğinde
+              registration.addEventListener('updatefound', () => {
+                const newWorker = registration.installing;
+                console.log('Yeni service worker durumu:', newWorker.state);
+
+                newWorker.addEventListener('statechange', () => {
+                  console.log('Service worker durumu:', newWorker.state);
+
+                  if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                    if (!isUpdatePending) {
+                      isUpdatePending = true;
+
+                      // Kullanıcıya sadece bir kez sor
+                      const updateApp = window.confirm(
+                        'Yeni bir versiyon mevcut. Güncellemek ister misiniz?'
+                      );
+
+                      if (updateApp) {
+                        newWorker.postMessage({ type: 'SKIP_WAITING' });
+                      }
+                    }
+                  }
+                });
+              });
+
+              // Halihazırda bekleyen bir güncelleme varsa
+              if (registration.waiting && navigator.serviceWorker.controller) {
+                if (!isUpdatePending) {
+                  isUpdatePending = true;
+
+                  const updateApp = window.confirm(
+                    'Bekleyen bir güncelleme mevcut. Şimdi uygulamak ister misiniz?'
+                  );
+
+                  if (updateApp) {
+                    registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+                  }
+                }
+              }
             })
             .catch(error => {
-              console.log('Service Worker kaydı başarısız:', error);
+              console.error('Service Worker kaydı başarısız:', error);
             });
         });
+
+        // Service worker değiştiğinde sayfayı yenile
+        let refreshing = false;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          if (!refreshing) {
+            refreshing = true;
+            window.location.reload();
+          }
+        });
+
+        // Periyodik güncelleme kontrolü (6 saatte bir)
+        const CHECK_INTERVAL = 6 * 60 * 60 * 1000; // 6 saat
+        let lastCheck = localStorage.getItem('lastUpdateCheck');
+
+        function checkForUpdates() {
+          const now = Date.now();
+          if (!lastCheck || now - lastCheck > CHECK_INTERVAL) {
+            navigator.serviceWorker.ready.then(registration => {
+              registration.update();
+              localStorage.setItem('lastUpdateCheck', now);
+            });
+          }
+        }
+
+        // İlk yüklemede ve periyodik olarak kontrol et
+        checkForUpdates();
+        setInterval(checkForUpdates, CHECK_INTERVAL);
       }
     </script>
   </body>

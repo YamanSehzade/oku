@@ -1,4 +1,4 @@
-const CACHE_NAME = 'oku-cache-v3';
+const CACHE_NAME = 'oku-cache-v4';
 const STATIC_CACHE_URLS = [
   '/',
   '/index.html',
@@ -8,6 +8,13 @@ const STATIC_CACHE_URLS = [
   '/vite.svg',
 ];
 
+// SKIP_WAITING mesajını dinle
+self.addEventListener('message', event => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
+
 // Install service worker
 self.addEventListener('install', event => {
   event.waitUntil(
@@ -16,46 +23,61 @@ self.addEventListener('install', event => {
       return cache.addAll(STATIC_CACHE_URLS);
     })
   );
-  // Worker'ı hemen aktifleştir
-  self.skipWaiting();
+  // skipWaiting'i kaldırdık, artık mesaj ile tetiklenecek
 });
 
 // Fetch kaynakları
 self.addEventListener('fetch', event => {
-  // Assets için stale-while-revalidate stratejisi
-  if (event.request.url.includes('/assets/')) {
-    event.respondWith(
-      caches.open(CACHE_NAME).then(cache => {
-        return cache.match(event.request).then(cachedResponse => {
-          const fetchedResponse = fetch(event.request).then(networkResponse => {
-            cache.put(event.request, networkResponse.clone());
-            return networkResponse;
-          });
-
-          return cachedResponse || fetchedResponse;
-        });
-      })
-    );
-  } else {
-    // Diğer kaynaklar için network-first stratejisi
+  // HTML istekleri için network-first stratejisi
+  if (event.request.mode === 'navigate') {
     event.respondWith(
       fetch(event.request)
         .then(response => {
-          // Başarılı yanıtı önbelleğe al
-          if (response.ok) {
-            const responseToCache = response.clone();
-            caches.open(CACHE_NAME).then(cache => {
-              cache.put(event.request, responseToCache);
-            });
-          }
           return response;
         })
         .catch(() => {
-          // Ağ hatası durumunda önbellekten sun
           return caches.match(event.request);
         })
     );
+    return;
   }
+
+  // Statik kaynaklar için cache-first stratejisi
+  if (
+    event.request.url.includes('/assets/') ||
+    event.request.url.includes('/icons/') ||
+    event.request.destination === 'style' ||
+    event.request.destination === 'script'
+  ) {
+    event.respondWith(
+      caches.match(event.request).then(cachedResponse => {
+        if (cachedResponse) {
+          // Arka planda güncelleme yap
+          fetch(event.request).then(response => {
+            if (response.ok) {
+              caches.open(CACHE_NAME).then(cache => {
+                cache.put(event.request, response);
+              });
+            }
+          });
+          return cachedResponse;
+        }
+        return fetch(event.request);
+      })
+    );
+    return;
+  }
+
+  // Diğer tüm istekler için network-first
+  event.respondWith(
+    fetch(event.request)
+      .then(response => {
+        return response;
+      })
+      .catch(() => {
+        return caches.match(event.request);
+      })
+  );
 });
 
 // Service worker'ı aktifleştir
@@ -67,14 +89,14 @@ self.addEventListener('activate', event => {
         return Promise.all(
           cacheNames.map(cacheName => {
             if (cacheName !== CACHE_NAME) {
+              console.log('Eski cache siliniyor:', cacheName);
               return caches.delete(cacheName);
             }
           })
         );
       })
       .then(() => {
-        // Yeni service worker'ın hemen kontrolü almasını sağla
-        clients.claim();
+        console.log('Yeni service worker aktif');
       })
   );
 });
