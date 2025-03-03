@@ -33,10 +33,14 @@ const BookDetailPage = () => {
 
   // Sayfa değiştiğinde otomatik kaydet
   useEffect(() => {
-    if (book) {
-      saveLastRead(book, currentPage, imageError);
-    }
-  }, [book, currentPage, imageError, saveLastRead]);
+    const saveTimeout = setTimeout(() => {
+      if (book) {
+        saveLastRead(book, currentPage, imageError);
+      }
+    }, 500); // 500ms debounce
+
+    return () => clearTimeout(saveTimeout);
+  }, [book, currentPage, imageError]);
 
   // Klavye kısa yolları için effect
   useEffect(() => {
@@ -151,6 +155,7 @@ const BookDetailPage = () => {
         </div>
       </div>
 
+      {/* Ana İçerik */}
       <motion.div
         className="flex h-full w-full items-center justify-center overflow-hidden"
         onClick={handleScreenTap}
@@ -196,53 +201,6 @@ const BookDetailPage = () => {
           </motion.div>
         </div>
 
-        {/* Alt Kontroller */}
-        <div
-          className={`fixed inset-x-0 bottom-0 z-50 m-4 rounded-xl bg-gradient-to-b from-black/70 to-transparent px-4 py-2 transition-opacity duration-300 ${
-            showControls ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'
-          }`}
-        >
-          <div className="flex items-center justify-between text-white">
-            <div className="text-sm">
-              {book.writer && <div className="font-medium">{book.writer}</div>}
-              <div className="text-white/70">{book.publisher}</div>
-            </div>
-            <div className="flex items-center gap-8">
-              <button
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-                className="rounded-lg bg-white/10 p-2 text-white backdrop-blur-sm transition-colors hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-30"
-              >
-                <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 19l-7-7 7-7"
-                  />
-                </svg>
-              </button>
-              <span className="rounded-lg bg-white/10 px-4 py-2 text-sm font-medium backdrop-blur-sm">
-                Sayfa {currentPage} / {book.pageCount}
-              </span>
-              <button
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={imageError}
-                className="rounded-lg bg-white/10 p-2 text-white backdrop-blur-sm transition-colors hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-30"
-              >
-                <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 5l7 7-7 7"
-                  />
-                </svg>
-              </button>
-            </div>
-          </div>
-        </div>
-
         {/* Kenar Kontrolleri */}
         <div
           className="absolute inset-y-0 left-0 z-10 h-full w-1/6 cursor-pointer"
@@ -273,6 +231,53 @@ const BookDetailPage = () => {
           }}
         />
       </motion.div>
+
+      {/* Alt Kontroller - motion.div dışına taşındı */}
+      <div
+        className={`fixed inset-x-0 bottom-0 z-50 m-4 rounded-xl bg-gradient-to-b from-black/70 to-transparent px-4 py-2 transition-opacity duration-300 ${
+          showControls ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'
+        }`}
+      >
+        <div className="flex items-center justify-between text-white">
+          <div className="text-sm">
+            {book.writer && <div className="font-medium">{book.writer}</div>}
+            <div className="text-white/70">{book.publisher}</div>
+          </div>
+          <div className="flex items-center gap-8">
+            <button
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="rounded-lg bg-white/10 p-2 text-white backdrop-blur-sm transition-colors hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-30"
+            >
+              <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
+            </button>
+            <span className="rounded-lg bg-white/10 px-4 py-2 text-sm font-medium backdrop-blur-sm">
+              Sayfa {currentPage} / {book.pageCount}
+            </span>
+            <button
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={imageError}
+              className="rounded-lg bg-white/10 p-2 text-white backdrop-blur-sm transition-colors hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-30"
+            >
+              <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
