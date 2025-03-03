@@ -10,7 +10,6 @@ import AboutPage from './pages/AboutPage';
 import BookDetailPage from './pages/BookDetailPage';
 import BookshelfPage from './pages/BookshelfPage';
 import LibraryPage from './pages/LibraryPage';
-import ProfilePage from './pages/ProfilePage';
 
 /**
  * Ana uygulama bileşeni
@@ -28,8 +27,6 @@ const AppContent = () => {
       setActiveTab('kutuphane');
     } else if (path === '/kitaplik') {
       setActiveTab('kitaplik');
-    } else if (path === '/hakkimda') {
-      setActiveTab('hakkimda');
     }
   }, [location.pathname]);
 
@@ -46,7 +43,6 @@ const AppContent = () => {
         <Routes>
           <Route path="/" element={<LibraryPage />} />
           <Route path="/kitaplik" element={<BookshelfPage />} />
-          <Route path="/hakkimda" element={<ProfilePage />} />
           <Route path="/hakkinda" element={<AboutPage />} />
           <Route path="/kitap/:id" element={<BookDetailPage />} />
         </Routes>
