@@ -1,4 +1,4 @@
-import { BiBookOpen, BiHeart, BiMenu, BiUser } from 'react-icons/bi';
+import { BiBookOpen, BiHeart, BiInfoCircle, BiMenu } from 'react-icons/bi';
 import { Link } from 'react-router-dom';
 
 type Props = {
@@ -30,10 +30,10 @@ const Header = ({ activeTab, setActiveTab, isMenuOpen, setIsMenuOpen }: Props) =
       href: '/kitaplik',
     },
     {
-      id: 'hakkimda',
-      name: 'Hakkımda',
-      icon: BiUser,
-      href: '/hakkimda',
+      id: 'hakkinda',
+      name: 'Hakkında',
+      icon: BiInfoCircle,
+      href: '/hakkinda',
     },
   ];
 

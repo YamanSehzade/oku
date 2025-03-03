@@ -6,6 +6,7 @@ import { LastReadProvider } from './context/LastReadContext';
 
 // Bileşen importları
 import Header from './components/Header';
+import AboutPage from './pages/AboutPage';
 import BookDetailPage from './pages/BookDetailPage';
 import BookshelfPage from './pages/BookshelfPage';
 import LibraryPage from './pages/LibraryPage';
@@ -46,6 +47,7 @@ const AppContent = () => {
           <Route path="/" element={<LibraryPage />} />
           <Route path="/kitaplik" element={<BookshelfPage />} />
           <Route path="/hakkimda" element={<ProfilePage />} />
+          <Route path="/hakkinda" element={<AboutPage />} />
           <Route path="/kitap/:id" element={<BookDetailPage />} />
         </Routes>
       </main>
