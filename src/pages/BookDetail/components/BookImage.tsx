@@ -22,8 +22,12 @@ export const BookImage = ({
     return (
       <div className={styles.error.container}>
         <div className={styles.error.content}>
-          <div className="mb-4 text-2xl font-semibold text-white">Kitap Bitti</div>
-          <div className="text-lg text-white/70">Bu kitabı okumayı tamamladınız</div>
+          <div className="mb-4 text-2xl font-semibold text-white dark:text-yellow-400">
+            Kitap Bitti
+          </div>
+          <div className="text-lg text-white/70 dark:text-yellow-400/60">
+            Bu kitabı okumayı tamamladınız
+          </div>
           <button onClick={onGoBack} className={styles.error.button}>
             Geri Dön
           </button>
@@ -37,7 +41,7 @@ export const BookImage = ({
       <img
         src={currentImageUrl}
         alt={`${book.name} - Sayfa ${currentPage}`}
-        className={`${styles.image.base} ${styles.image.responsive} h-auto`}
+        className={`${styles.image.base} ${styles.image.responsive} h-auto dark:[filter:sepia(0.3)_saturate(1.2)_hue-rotate(0deg)_brightness(0.85)]`}
         onError={onError}
         draggable={false}
       />

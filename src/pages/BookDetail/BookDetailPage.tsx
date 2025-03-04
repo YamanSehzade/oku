@@ -105,7 +105,7 @@ const BookDetailPage = () => {
   if (!selectedBook) return null;
 
   return (
-    <div className="relative h-full w-full overflow-hidden bg-white">
+    <div className="relative h-full w-full overflow-hidden bg-white dark:bg-gray-900">
       <TopBar
         book={selectedBook}
         controlsClassName={controlsClassName}
@@ -114,7 +114,7 @@ const BookDetailPage = () => {
 
       {/* Ana İçerik */}
       <motion.div
-        className={styles.content.wrapper}
+        className={`${styles.content.wrapper} dark:bg-gray-900`}
         onClick={() => setShowControls(prev => !prev)}
         drag="x"
         dragDirectionLock
@@ -125,7 +125,7 @@ const BookDetailPage = () => {
         <div ref={containerRef} className={styles.content.container}>
           <motion.div
             animate={controls}
-            className={styles.content.imageContainer}
+            className={`${styles.content.imageContainer} dark:bg-gray-900`}
             style={{ ...styles.motion.base }}
             drag={false}
           >

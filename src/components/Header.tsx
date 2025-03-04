@@ -56,31 +56,6 @@ const Header = ({ activeTab, setActiveTab, isMenuOpen, setIsMenuOpen }: Props) =
             </h1>
           </div>
 
-          {/* Tema Değiştirme Butonu */}
-          <div className="mr-4">
-            <button
-              onClick={toggleTheme}
-              className="rounded-lg p-2 text-gray-500 hover:bg-transparent dark:text-gray-400 dark:hover:bg-transparent"
-            >
-              {theme === 'light' ? <BiMoon className="h-5 w-5" /> : <BiSun className="h-5 w-5" />}
-            </button>
-          </div>
-
-          {/* Mobil Menü Butonu */}
-          <div className="sm:hidden">
-            <button
-              type="button"
-              className="inline-flex items-center justify-center rounded-md p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-600 focus:outline-none dark:hover:bg-gray-700 dark:hover:text-gray-300"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-            >
-              <BiMenuAltRight
-                className={`h-7 w-7 transform transition-transform duration-300 ${
-                  isMenuOpen ? 'rotate-180' : ''
-                }`}
-              />
-            </button>
-          </div>
-
           {/* Desktop Menü */}
           <div className="hidden sm:flex sm:space-x-8">
             {tabs.map(tab => (
@@ -102,6 +77,32 @@ const Header = ({ activeTab, setActiveTab, isMenuOpen, setIsMenuOpen }: Props) =
                 {tab.name}
               </Link>
             ))}
+          </div>
+
+          <div className="flex items-center gap-2">
+            {/* Tema Değiştirme Butonu */}
+            <button
+              onClick={toggleTheme}
+              className="rounded-lg p-2 text-gray-500 transition-colors hover:bg-gray-100 dark:text-yellow-400 dark:hover:bg-yellow-400/10"
+              title={theme === 'light' ? 'Koyu Tema' : 'Açık Tema'}
+            >
+              {theme === 'light' ? <BiMoon className="h-5 w-5" /> : <BiSun className="h-5 w-5" />}
+            </button>
+
+            {/* Mobil Menü Butonu */}
+            <div className="sm:hidden">
+              <button
+                type="button"
+                className="inline-flex items-center justify-center rounded-md p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-600 focus:outline-none dark:hover:bg-gray-700 dark:hover:text-gray-300"
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+              >
+                <BiMenuAltRight
+                  className={`h-7 w-7 transform transition-transform duration-300 ${
+                    isMenuOpen ? 'rotate-180' : ''
+                  }`}
+                />
+              </button>
+            </div>
           </div>
         </div>
 

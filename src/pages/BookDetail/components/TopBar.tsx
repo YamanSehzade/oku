@@ -1,4 +1,5 @@
-import { BiArrowBack, BiPrinter } from 'react-icons/bi';
+import { BiArrowBack, BiMoon, BiPrinter, BiSun } from 'react-icons/bi';
+import { useTheme } from '../../../context/ThemeContext';
 import { Book } from '../../../types/book';
 
 interface TopBarProps {
@@ -8,6 +9,8 @@ interface TopBarProps {
 }
 
 export const TopBar = ({ book, controlsClassName, onGoBack }: TopBarProps) => {
+  const { theme, toggleTheme } = useTheme();
+
   const handlePrint = () => {
     const currentImage = document.querySelector('img[alt*="Sayfa"]') as HTMLImageElement;
     if (!currentImage) return;
@@ -77,25 +80,40 @@ export const TopBar = ({ book, controlsClassName, onGoBack }: TopBarProps) => {
 
   return (
     <div
-      className={`${controlsClassName} top-0 mx-2 mt-4 rounded-2xl bg-black/50 px-3 py-2 backdrop-blur-sm sm:mx-4 sm:px-4`}
+      className={`${controlsClassName} top-0 mx-1 mt-2 rounded-xl bg-black/50 px-2 py-1.5 backdrop-blur-sm dark:bg-black/30 sm:mx-4 sm:mt-4 sm:rounded-2xl sm:px-3 sm:py-2`}
     >
-      <div className="flex items-center justify-between text-white">
+      <div className="flex items-center justify-between text-white dark:text-yellow-400">
         <button
           onClick={onGoBack}
-          className="flex items-center rounded-xl bg-white/10 px-3 py-2 text-xs font-medium backdrop-blur-sm transition-opacity hover:bg-white/20 sm:px-4 sm:text-sm"
+          className="flex items-center rounded-lg bg-white/10 px-2 py-1.5 text-[10px] font-medium backdrop-blur-sm transition-opacity hover:bg-white/20 dark:bg-white/5 dark:hover:bg-white/10 sm:rounded-xl sm:px-3 sm:py-2 sm:text-xs"
         >
-          <BiArrowBack className="mr-1.5 h-4 w-4 sm:h-5 sm:w-5" />
+          <BiArrowBack className="mr-1 h-3.5 w-3.5 sm:mr-1.5 sm:h-4 sm:w-4" />
           Geri
         </button>
-        <div className="flex items-center gap-2 sm:gap-4">
-          <h1 className="truncate text-sm font-medium sm:text-base">{book.name}</h1>
-          <button
-            onClick={handlePrint}
-            className="flex items-center rounded-xl bg-white/10 p-2 text-xs font-medium backdrop-blur-sm transition-opacity hover:bg-white/20 sm:text-sm"
-            title="Sayfayı Yazdır"
-          >
-            <BiPrinter className="h-4 w-4 sm:h-5 sm:w-5" />
-          </button>
+        <div className="flex items-center gap-1 sm:gap-4">
+          <h1 className="max-w-[120px] truncate text-xs font-medium sm:max-w-none sm:text-sm">
+            {book.name}
+          </h1>
+          <div className="flex gap-1 sm:gap-2">
+            <button
+              onClick={toggleTheme}
+              className="flex items-center rounded-lg bg-white/10 p-1.5 text-[10px] font-medium backdrop-blur-sm transition-opacity hover:bg-white/20 dark:bg-white/5 dark:hover:bg-white/10 sm:rounded-xl sm:p-2 sm:text-xs"
+              title={theme === 'dark' ? 'Açık Tema' : 'Koyu Tema'}
+            >
+              {theme === 'dark' ? (
+                <BiSun className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              ) : (
+                <BiMoon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              )}
+            </button>
+            <button
+              onClick={handlePrint}
+              className="flex items-center rounded-lg bg-white/10 p-1.5 text-[10px] font-medium backdrop-blur-sm transition-opacity hover:bg-white/20 dark:bg-white/5 dark:hover:bg-white/10 sm:rounded-xl sm:p-2 sm:text-xs"
+              title="Sayfayı Yazdır"
+            >
+              <BiPrinter className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            </button>
+          </div>
         </div>
       </div>
     </div>

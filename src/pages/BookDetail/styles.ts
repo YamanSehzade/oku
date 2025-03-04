@@ -14,14 +14,14 @@ export const styles = {
     visible: 'pointer-events-auto opacity-100',
     hidden: 'pointer-events-none opacity-0',
     button:
-      'rounded-lg bg-white/10 p-2 text-white backdrop-blur-sm transition-colors hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-30',
+      'rounded-lg bg-white/10 p-2 text-white backdrop-blur-sm transition-colors hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-30 dark:bg-black/10 dark:hover:bg-black/20',
   },
 
   // Hata sayfası stilleri
   error: {
     container: 'flex h-screen items-center justify-center',
     content: 'text-center',
-    title: 'mb-4 text-2xl font-bold text-gray-900',
+    title: 'mb-4 text-2xl font-bold text-gray-900 dark:text-white',
     button:
       'rounded-lg bg-secondary-600 px-6 py-2 text-white transition-colors hover:bg-secondary-700',
   },
