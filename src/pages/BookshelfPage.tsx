@@ -106,7 +106,7 @@ const BookshelfPage = () => {
                 transition={{ duration: 0.3 }}
               >
                 <div className="border-t border-gray-100 p-6 dark:border-gray-700">
-                  <div className="grid gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7">
                     {recentlyReadBooks.map((book, index) => (
                       <BookCard
                         key={book.link}
@@ -150,7 +150,7 @@ const BookshelfPage = () => {
                 transition={{ duration: 0.3 }}
               >
                 <div className="border-t border-gray-100 p-6 dark:border-gray-700">
-                  <div className="grid gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7">
                     {favorites.map((book, index) => (
                       <BookCard key={book.link} book={book} index={index} />
                     ))}
@@ -189,7 +189,7 @@ const BookshelfPage = () => {
                 transition={{ duration: 0.3 }}
               >
                 <div className="border-t border-gray-100 p-6 dark:border-gray-700">
-                  <div className="grid gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7">
                     {finishedBooks.map((book, index) => (
                       <BookCard
                         key={book.link}
