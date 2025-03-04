@@ -1,5 +1,6 @@
-import { BiBookOpen, BiInfoCircle, BiLibrary, BiMenuAltRight } from 'react-icons/bi';
+import { BiBookOpen, BiInfoCircle, BiLibrary, BiMenuAltRight, BiMoon, BiSun } from 'react-icons/bi';
 import { Link } from 'react-router-dom';
+import { useTheme } from '../context/ThemeContext';
 
 type Props = {
   activeTab: string;
@@ -16,6 +17,8 @@ type Props = {
  * @param setIsMenuOpen - Mobil menüyü açıp/kapatan fonksiyon
  */
 const Header = ({ activeTab, setActiveTab, isMenuOpen, setIsMenuOpen }: Props) => {
+  const { theme, toggleTheme } = useTheme();
+
   const tabs = [
     {
       id: 'kitaplik',
@@ -38,28 +41,42 @@ const Header = ({ activeTab, setActiveTab, isMenuOpen, setIsMenuOpen }: Props) =
   ];
 
   return (
-    <header className="bg-white shadow-sm">
+    <header className="bg-white shadow-sm transition-colors duration-200 dark:bg-gray-800">
       <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           {/* Logo ve Başlık */}
           <div className="flex flex-shrink-0 items-center">
             <img
-              src="/icons/icon-192x192.png"
+              src="/icons/icon-512x512.png"
               alt="Oku Logo"
-              className="mr-3 h-10 w-10 sm:h-12 sm:w-12"
+              className="mr-3 h-10 w-10 bg-transparent sm:h-12 sm:w-12"
             />
-            <h1 className="font-display text-2xl font-bold text-secondary-600 sm:text-3xl">OKU</h1>
+            <h1 className="font-display text-2xl font-bold text-secondary-600 sm:text-3xl dark:text-secondary-400">
+              OKU
+            </h1>
+          </div>
+
+          {/* Tema Değiştirme Butonu */}
+          <div className="mr-4">
+            <button
+              onClick={toggleTheme}
+              className="rounded-lg p-2 text-gray-500 hover:bg-transparent dark:text-gray-400 dark:hover:bg-transparent"
+            >
+              {theme === 'light' ? <BiMoon className="h-5 w-5" /> : <BiSun className="h-5 w-5" />}
+            </button>
           </div>
 
           {/* Mobil Menü Butonu */}
           <div className="sm:hidden">
             <button
               type="button"
-              className="inline-flex items-center justify-center rounded-md p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-600 focus:outline-none"
+              className="inline-flex items-center justify-center rounded-md p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-600 focus:outline-none dark:hover:bg-gray-700 dark:hover:text-gray-300"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
               <BiMenuAltRight
-                className={`h-7 w-7 transform transition-transform duration-300 ${isMenuOpen ? 'rotate-180' : ''}`}
+                className={`h-7 w-7 transform transition-transform duration-300 ${
+                  isMenuOpen ? 'rotate-180' : ''
+                }`}
               />
             </button>
           </div>
@@ -72,8 +89,8 @@ const Header = ({ activeTab, setActiveTab, isMenuOpen, setIsMenuOpen }: Props) =
                 to={tab.href}
                 className={`${
                   activeTab === tab.id
-                    ? 'border-primary-500 text-primary-600'
-                    : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                    ? 'border-primary-500 text-primary-600 dark:text-primary-400'
+                    : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-300'
                 } inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium transition-colors duration-200`}
                 onClick={() => setActiveTab(tab.id)}
               >
@@ -101,8 +118,8 @@ const Header = ({ activeTab, setActiveTab, isMenuOpen, setIsMenuOpen }: Props) =
                 to={tab.href}
                 className={`${
                   activeTab === tab.id
-                    ? 'border-primary-500 bg-primary-50 text-primary-700'
-                    : 'border-transparent text-gray-500 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700'
+                    ? 'border-primary-500 bg-primary-50 text-primary-700 dark:bg-gray-700 dark:text-primary-400'
+                    : 'border-transparent text-gray-500 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700 dark:hover:bg-gray-700 dark:hover:text-gray-300'
                 } block border-l-4 py-2 pl-3 pr-4 text-base font-medium transition-all duration-200`}
                 onClick={() => {
                   setActiveTab(tab.id);

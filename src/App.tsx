@@ -7,32 +7,6 @@ import AboutPage from './pages/AboutPage';
 import BookshelfPage from './pages/BookshelfPage';
 import LibraryPage from './pages/LibraryPage';
 
-interface DefaultLayoutProps {
-  children?: React.ReactNode;
-  activeTab: string;
-  setActiveTab: (tab: string) => void;
-  isMenuOpen: boolean;
-  setIsMenuOpen: (isOpen: boolean) => void;
-}
-
-const DefaultLayout = ({
-  children,
-  activeTab,
-  setActiveTab,
-  isMenuOpen,
-  setIsMenuOpen,
-}: DefaultLayoutProps) => (
-  <main className="min-h-screen bg-primary-50">
-    <Header
-      activeTab={activeTab}
-      setActiveTab={setActiveTab}
-      isMenuOpen={isMenuOpen}
-      setIsMenuOpen={setIsMenuOpen}
-    />
-    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">{children || <Outlet />}</div>
-  </main>
-);
-
 const App = () => {
   // URL'e göre başlangıç tab'ini belirle
   const getInitialTab = () => {
@@ -49,17 +23,22 @@ const App = () => {
   return (
     <BrowserRouter>
       <Providers>
-        <div className="font-body min-h-screen bg-primary-50">
+        <div className="font-body min-h-screen bg-primary-50 dark:bg-gray-900">
           <Routes>
             <Route
               path="/"
               element={
-                <DefaultLayout
-                  activeTab={activeTab}
-                  setActiveTab={setActiveTab}
-                  isMenuOpen={isMenuOpen}
-                  setIsMenuOpen={setIsMenuOpen}
-                />
+                <main className="min-h-screen bg-primary-50 transition-colors duration-200 dark:bg-gray-900">
+                  <Header
+                    activeTab={activeTab}
+                    setActiveTab={setActiveTab}
+                    isMenuOpen={isMenuOpen}
+                    setIsMenuOpen={setIsMenuOpen}
+                  />
+                  <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+                    <Outlet />
+                  </div>
+                </main>
               }
             >
               <Route index element={<BookshelfPage />} />
