@@ -29,13 +29,15 @@ const App = () => {
               path="/"
               element={
                 <main className="min-h-screen bg-primary-50 transition-colors duration-200 dark:bg-gray-900">
-                  <Header
-                    activeTab={activeTab}
-                    setActiveTab={setActiveTab}
-                    isMenuOpen={isMenuOpen}
-                    setIsMenuOpen={setIsMenuOpen}
-                  />
-                  <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+                  <div className="pt-[env(safe-area-inset-top)]">
+                    <Header
+                      activeTab={activeTab}
+                      setActiveTab={setActiveTab}
+                      isMenuOpen={isMenuOpen}
+                      setIsMenuOpen={setIsMenuOpen}
+                    />
+                  </div>
+                  <div className="mx-auto max-w-7xl px-4 py-6 pb-[env(safe-area-inset-bottom)] sm:px-6 lg:px-8">
                     <Outlet />
                   </div>
                 </main>

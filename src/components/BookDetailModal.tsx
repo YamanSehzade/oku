@@ -12,23 +12,26 @@ export const BookDetailModal = () => {
   return (
     <AnimatePresence>
       {selectedBook && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black"
-          onClick={handleClose}
-        >
+        <>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] bg-black"
+            onClick={handleClose}
+          />
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
-            className="h-full w-full overflow-hidden bg-white"
+            className="fixed inset-0 z-[101] bg-white"
             onClick={e => e.stopPropagation()}
           >
-            <BookDetailPage />
+            <div className="h-full w-full overflow-hidden">
+              <BookDetailPage />
+            </div>
           </motion.div>
-        </motion.div>
+        </>
       )}
     </AnimatePresence>
   );
