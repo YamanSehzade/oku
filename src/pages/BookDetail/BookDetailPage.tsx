@@ -92,7 +92,7 @@ const BookDetailPage = () => {
     }, 500); // 500ms debounce
 
     return () => clearTimeout(saveTimeout);
-  }, [selectedBook, currentPage, imageError]);
+  }, [selectedBook, currentPage, imageError, saveLastRead]);
 
   // Kontrol sınıfları
   const controlsClassName = useMemo(() => {
