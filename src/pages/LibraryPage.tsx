@@ -115,12 +115,12 @@ const LibraryPage = () => {
   return (
     <div className="space-y-6">
       {/* Sayfa Başlığı */}
-      <div className="rounded-lg border-l-2 border-primary-400 bg-white p-3 shadow-sm sm:p-4">
-        <h2 className="mb-2 flex items-center text-lg font-medium text-gray-800 sm:text-xl">
+      <div className="rounded-lg border-l-2 border-primary-400 bg-white p-3 shadow-sm sm:p-4 dark:bg-gray-800">
+        <h2 className="mb-2 flex items-center text-lg font-medium text-gray-800 sm:text-xl dark:text-white">
           <BiBookOpen className="mr-2 h-5 w-5 text-primary-400 sm:h-6 sm:w-6" />
           Kütüphane
         </h2>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-gray-500 dark:text-gray-400">
           Tüm kitapların listelendiği bölüm. Kitapları kategorilere göre filtreleyebilir veya arama
           yapabilirsiniz.
         </p>
@@ -128,7 +128,9 @@ const LibraryPage = () => {
 
       {/* Arama Çubuğu */}
       <div
-        className={`sticky top-0 z-50 bg-white/80 p-3 backdrop-blur-lg transition-all duration-300 ${isScrolled ? 'rounded-none shadow-md' : 'rounded-lg'}`}
+        className={`sticky top-0 z-50 bg-white/80 p-3 backdrop-blur-lg transition-all duration-300 dark:bg-gray-800/80 ${
+          isScrolled ? 'rounded-none shadow-md' : 'rounded-lg'
+        }`}
       >
         <div className="relative transition-all duration-300 hover:scale-[1.01] hover:transform">
           <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
@@ -139,16 +141,16 @@ const LibraryPage = () => {
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
             placeholder="Kitap adı, yazar, yayınevi veya seri adı ile arayın..."
-            className={`block w-full rounded-xl border-2 border-gray-100 bg-white py-3.5 pl-11 pr-4 text-sm shadow-lg placeholder:text-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 sm:text-base`}
+            className={`block w-full rounded-xl border-2 border-gray-100 bg-white py-3.5 pl-11 pr-4 text-sm shadow-lg placeholder:text-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 sm:text-base dark:border-gray-700 dark:bg-gray-700 dark:text-white dark:placeholder:text-gray-500`}
           />
         </div>
       </div>
 
       {/* Sonuç Bilgisi */}
       {searchTerm && (
-        <p className="flex items-center text-sm text-gray-600">
-          <BiFilterAlt className="mr-1.5 h-4 w-4 text-gray-400" />
-          <span className="font-medium">{filteredBooks.length}</span> sonuç bulundu
+        <p className="flex items-center text-sm text-gray-600 dark:text-gray-300">
+          <BiFilterAlt className="mr-1.5 h-4 w-4 text-gray-400 dark:text-gray-500" />
+          <span className="mr-1 font-bold">{filteredBooks.length} </span>sonuç bulundu
         </p>
       )}
 
@@ -173,9 +175,9 @@ const LibraryPage = () => {
 
       {/* Sonuç Bulunamadı */}
       {filteredBooks.length === 0 && (
-        <div className="rounded-lg border-2 border-dashed border-gray-200 p-8 text-center">
-          <BiError className="mx-auto mb-3 h-8 w-8 text-gray-400" />
-          <p className="text-gray-500">Aramanızla eşleşen kitap bulunamadı.</p>
+        <div className="rounded-lg border-2 border-dashed border-gray-200 p-8 text-center dark:border-gray-700">
+          <BiError className="mx-auto mb-3 h-8 w-8 text-gray-400 dark:text-gray-500" />
+          <p className="text-gray-500 dark:text-gray-400">Aramanızla eşleşen kitap bulunamadı.</p>
         </div>
       )}
     </div>
