@@ -76,6 +76,13 @@ const BookDetailPage = () => {
     imageError,
   });
 
+  // Kitap bittiğinde sayfa sayısını düzelt
+  useEffect(() => {
+    if (imageError && selectedBook) {
+      setCurrentPage(prev => Math.max(1, prev - 1));
+    }
+  }, [imageError, selectedBook]);
+
   // Klavye event listener'ı
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => handleInteraction('keyboard', e);
