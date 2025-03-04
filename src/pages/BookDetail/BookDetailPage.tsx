@@ -1,39 +1,24 @@
 import { motion } from 'framer-motion';
-import debounce from 'lodash/debounce';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useApp } from '../../context/AppContext';
 import { useLastRead } from '../../context/LastReadContext';
-import { books } from '../../utils/books';
 import { BookImage } from './components/BookImage';
 import { BottomBar } from './components/BottomBar';
 import { EdgeControls } from './components/EdgeControls';
 import { TopBar } from './components/TopBar';
-import { SWIPE_CONF, useBookAnimation } from './hooks/useBookAnimation';
+import { useBookAnimation } from './hooks/useBookAnimation';
 import { useBookEvents } from './hooks/useBookEvents';
 import { useBookImage } from './hooks/useBookImage';
 import { styles } from './styles';
 
 const BookDetailPage = () => {
-  const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
-  const location = useLocation();
+  const { selectedBook, setSelectedBook } = useApp();
   const { getLastRead, saveLastRead } = useLastRead();
-
-  // URL'den gelen id'yi decode et ve kitabı bul
-  const decodedId = useMemo(() => (id ? decodeURIComponent(id) : ''), [id]);
-
-  const book = useMemo(() => {
-    return books.find(b => {
-      const urlParts = b.link.split('/');
-      const bookId = urlParts[urlParts.length - 1];
-      return bookId === decodedId;
-    });
-  }, [decodedId]);
 
   // Kitabın son okunan sayfasını al veya 1'den başla
   const [currentPage, setCurrentPage] = useState(() => {
-    if (!book) return 1;
-    return getLastRead(book) || 2;
+    if (!selectedBook) return 1;
+    return getLastRead(selectedBook) || 2;
   });
 
   const [imageError, setImageError] = useState(false);
@@ -86,7 +71,7 @@ const BookDetailPage = () => {
   });
 
   const { currentImageUrl, nextImageUrl, prevImageUrl } = useBookImage({
-    book,
+    book: selectedBook || undefined,
     currentPage,
     imageError,
   });
@@ -101,13 +86,13 @@ const BookDetailPage = () => {
   // Sayfa değiştiğinde otomatik kaydet
   useEffect(() => {
     const saveTimeout = setTimeout(() => {
-      if (book) {
-        saveLastRead(book, currentPage, imageError);
+      if (selectedBook) {
+        saveLastRead(selectedBook, currentPage, imageError);
       }
     }, 500); // 500ms debounce
 
     return () => clearTimeout(saveTimeout);
-  }, [book, currentPage, imageError]);
+  }, [selectedBook, currentPage, imageError]);
 
   // Kontrol sınıfları
   const controlsClassName = useMemo(() => {
@@ -117,51 +102,25 @@ const BookDetailPage = () => {
   // Buton sınıfları
   const buttonClassName = useMemo(() => styles.controls.button, []);
 
-  const handleGoBack = useCallback(() => {
-    const previousPath = location.state?.from || '/';
-    navigate(previousPath);
-  }, [location.state, navigate]);
-
-  // Screen tap handler'ı - debounce eklenmiş
-  const handleScreenTap = useMemo(
-    () =>
-      debounce((e: React.MouseEvent) => {
-        if (isClickableElement(e.target as HTMLElement)) return;
-        setShowControls(prev => !prev);
-      }, 100),
-    [isClickableElement]
-  );
-
-  if (!book) {
-    return (
-      <div className={styles.error.container}>
-        <div className={styles.error.content}>
-          <h2 className={styles.error.title}>Kitap bulunamadı</h2>
-          <button onClick={handleGoBack} className={styles.error.button}>
-            Geri Dön
-          </button>
-        </div>
-      </div>
-    );
-  }
+  if (!selectedBook) return null;
 
   return (
-    <div className={styles.container}>
-      <TopBar book={book} controlsClassName={controlsClassName} onGoBack={handleGoBack} />
+    <div className="relative h-full w-full overflow-hidden bg-white">
+      <TopBar
+        book={selectedBook}
+        controlsClassName={controlsClassName}
+        onGoBack={() => setSelectedBook(null)}
+      />
 
       {/* Ana İçerik */}
       <motion.div
         className={styles.content.wrapper}
-        onClick={handleScreenTap}
+        onClick={() => setShowControls(prev => !prev)}
         drag="x"
         dragDirectionLock
-        dragMomentum={false}
         dragConstraints={{ left: 0, right: 0 }}
-        dragElastic={SWIPE_CONF.dragElastic}
+        dragElastic={0.2}
         onDragEnd={handleDragEnd}
-        initial={false}
-        layoutId="page-container"
-        style={{ touchAction: 'pan-y' }}
       >
         <div ref={containerRef} className={styles.content.container}>
           <motion.div
@@ -171,17 +130,12 @@ const BookDetailPage = () => {
             drag={false}
           >
             <BookImage
-              book={book}
+              book={selectedBook}
               currentPage={currentPage}
               imageError={imageError}
               currentImageUrl={currentImageUrl}
-              onError={() => {
-                setImageError(true);
-                if (currentPage > 1) {
-                  setCurrentPage(currentPage - 1);
-                }
-              }}
-              onGoBack={handleGoBack}
+              onError={() => setImageError(true)}
+              onGoBack={() => {}}
             />
           </motion.div>
         </div>
@@ -190,7 +144,7 @@ const BookDetailPage = () => {
       </motion.div>
 
       <BottomBar
-        book={book}
+        book={selectedBook}
         currentPage={currentPage}
         controlsClassName={controlsClassName}
         buttonClassName={buttonClassName}

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { BiHeart } from 'react-icons/bi';
-import { Link, useLocation } from 'react-router-dom';
+import { useApp } from '../context/AppContext';
 import { useFavorites } from '../context/FavoritesContext';
 import { Book } from '../types/book';
 
@@ -13,8 +13,8 @@ type Props = {
 const BookCard: React.FC<Props> = ({ book, lastReadPage }) => {
   const [imageError, setImageError] = useState(false);
   const { isFavorite, addFavorite, removeFavorite } = useFavorites();
+  const { setSelectedBook } = useApp();
   const favorite = isFavorite(book);
-  const location = useLocation();
 
   // Kitap başlığını düzenle
   const getFormattedTitle = () => {
@@ -50,14 +50,14 @@ const BookCard: React.FC<Props> = ({ book, lastReadPage }) => {
     return title;
   };
 
-  // Kitabın link'inden id'yi çıkar
-  const getBookId = () => {
-    const urlParts = book.link.split('/');
-    return urlParts[urlParts.length - 1];
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setSelectedBook(book);
   };
 
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     if (favorite) {
       removeFavorite(book);
     } else {
@@ -66,10 +66,9 @@ const BookCard: React.FC<Props> = ({ book, lastReadPage }) => {
   };
 
   return (
-    <Link
-      to={`/kitap/${getBookId()}`}
-      state={{ from: location.pathname }}
-      className="group relative block aspect-[3/4] overflow-hidden rounded-xl bg-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+    <div
+      onClick={handleClick}
+      className="group relative block aspect-[3/4] cursor-pointer overflow-hidden rounded-xl bg-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
     >
       {/* Arka Plan Resmi */}
       <div
@@ -131,7 +130,7 @@ const BookCard: React.FC<Props> = ({ book, lastReadPage }) => {
           </div>
         </div>
       </div>
-    </Link>
+    </div>
   );
 };
 
