@@ -12,6 +12,7 @@ const BOOKS_PER_PAGE = 50;
  */
 const LibraryPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedPublisher, setSelectedPublisher] = useState<string>('');
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
@@ -79,8 +80,16 @@ const LibraryPage = () => {
     return turkishToEnglish(trimmed);
   };
 
+  // Benzersiz yayınevlerini al
+  const publishers = Array.from(new Set(books.map(book => book.publisher))).sort();
+
   // Arama fonksiyonu
   const filteredBooks = books.filter(book => {
+    // Yayınevi filtresi
+    if (selectedPublisher && book.publisher !== selectedPublisher) {
+      return false;
+    }
+
     const searchWords = normalizeText(searchTerm)
       .split(' ')
       .filter(word => word.length > 0);
@@ -113,11 +122,11 @@ const LibraryPage = () => {
   }, [searchTerm]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Sayfa Başlığı */}
-      <div className="rounded-lg border-l-2 border-primary-400 bg-white p-3 shadow-sm sm:p-4 dark:bg-gray-800">
-        <h2 className="mb-2 flex items-center text-lg font-medium text-gray-800 sm:text-xl dark:text-white">
-          <BiBookOpen className="mr-2 h-5 w-5 text-primary-400 sm:h-6 sm:w-6" />
+      <div className="rounded-lg border border-gray-100 bg-white p-4 shadow-sm transition-all duration-200 hover:shadow dark:border-gray-700 dark:bg-gray-800">
+        <h2 className="mb-1.5 flex items-center text-lg font-medium text-gray-800 sm:text-xl dark:text-white">
+          <BiBookOpen className="mr-2 h-5 w-5 text-primary-500 sm:h-6 sm:w-6" />
           Kütüphane
         </h2>
         <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -126,36 +135,85 @@ const LibraryPage = () => {
         </p>
       </div>
 
-      {/* Arama Çubuğu */}
+      {/* Arama ve Filtre Alanı */}
       <div
-        className={`sticky top-0 z-50 bg-white/80 p-3 backdrop-blur-lg transition-all duration-300 dark:bg-gray-800/80 ${
-          isScrolled ? 'rounded-none shadow-md' : 'rounded-lg'
+        className={`sticky top-0 z-50 rounded-lg bg-white/95 p-3 backdrop-blur-lg transition-all duration-300 dark:bg-gray-800/95 ${
+          isScrolled ? 'shadow-lg' : 'border border-gray-100 dark:border-gray-700'
         }`}
       >
-        <div className="relative transition-all duration-300 hover:scale-[1.01] hover:transform">
-          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-            <BiSearch className="h-5 w-5 text-primary-500" />
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-3">
+          {/* Arama Kutusu */}
+          <div className="relative flex-1">
+            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
+              <BiSearch className="h-[18px] w-[18px] text-gray-400" />
+            </div>
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+              placeholder="Kitap adı, yazar, yayınevi veya seri adı ile arayın..."
+              className="block w-full rounded-lg border border-gray-200 bg-gray-50 py-3 pl-10 pr-3 text-[15px] text-gray-900 shadow-sm transition-all duration-200 placeholder:text-gray-500 focus:border-primary-500 focus:bg-white focus:shadow-md focus:outline-none focus:ring-1 focus:ring-primary-500/30 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-400 dark:focus:border-primary-400 dark:focus:bg-gray-800"
+            />
           </div>
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={e => setSearchTerm(e.target.value)}
-            placeholder="Kitap adı, yazar, yayınevi veya seri adı ile arayın..."
-            className={`block w-full rounded-xl border-2 border-gray-100 bg-white py-3.5 pl-11 pr-4 text-sm shadow-lg placeholder:text-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 sm:text-base dark:border-gray-700 dark:bg-gray-700 dark:text-white dark:placeholder:text-gray-500`}
-          />
+
+          {/* Yayınevi Filtresi */}
+          <div className="relative flex w-full sm:w-auto">
+            <select
+              value={selectedPublisher}
+              onChange={e => setSelectedPublisher(e.target.value)}
+              className="w-full appearance-none rounded-lg border border-gray-200 bg-gray-50 px-3.5 py-3 pr-10 text-[15px] text-gray-900 shadow-sm transition-all duration-200 focus:border-primary-500 focus:bg-white focus:shadow-md focus:outline-none focus:ring-1 focus:ring-primary-500/30 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:border-primary-400 dark:focus:bg-gray-800"
+            >
+              <option value="">Tüm Yayınevleri</option>
+              {publishers.map(publisher => (
+                <option key={publisher} value={publisher} className="py-2">
+                  {publisher}
+                </option>
+              ))}
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+              <svg
+                className="h-4 w-4 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Sonuç Bilgisi */}
-      {searchTerm && (
-        <p className="flex items-center text-sm text-gray-600 dark:text-gray-300">
-          <BiFilterAlt className="mr-1.5 h-4 w-4 text-gray-400 dark:text-gray-500" />
-          <span className="mr-1 font-bold">{filteredBooks.length} </span>sonuç bulundu
-        </p>
+      {(searchTerm || selectedPublisher) && (
+        <div className="flex items-center justify-between rounded-lg border border-gray-100 bg-white px-4 py-3 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+          <div className="flex items-center gap-2">
+            <BiFilterAlt className="h-4 w-4 text-primary-500" />
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              {filteredBooks.length} sonuç bulundu
+            </span>
+          </div>
+          {(searchTerm || selectedPublisher) && (
+            <button
+              onClick={() => {
+                setSearchTerm('');
+                setSelectedPublisher('');
+              }}
+              className="text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+            >
+              Filtreleri Temizle
+            </button>
+          )}
+        </div>
       )}
 
       {/* Kitap Listesi */}
-      <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+      <div className="grid gap-4 sm:grid-cols-2 sm:gap-5 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
         {paginatedBooks.map((book, index) => (
           <div
             key={book.link}
@@ -168,16 +226,16 @@ const LibraryPage = () => {
 
       {/* Yükleniyor */}
       {loading && (
-        <div className="flex justify-center py-4">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary-500 border-t-transparent"></div>
+        <div className="flex justify-center py-6">
+          <div className="border-3 h-8 w-8 animate-spin rounded-full border-primary-500 border-t-transparent"></div>
         </div>
       )}
 
       {/* Sonuç Bulunamadı */}
       {filteredBooks.length === 0 && (
-        <div className="rounded-lg border-2 border-dashed border-gray-200 p-8 text-center dark:border-gray-700">
-          <BiError className="mx-auto mb-3 h-8 w-8 text-gray-400 dark:text-gray-500" />
-          <p className="text-gray-500 dark:text-gray-400">Aramanızla eşleşen kitap bulunamadı.</p>
+        <div className="flex flex-col items-center justify-center rounded-lg border border-gray-200 bg-gray-50 py-12 text-center dark:border-gray-700 dark:bg-gray-800/50">
+          <BiError className="mb-3 h-10 w-10 text-gray-400 dark:text-gray-500" />
+          <p className="text-gray-600 dark:text-gray-400">Aramanızla eşleşen kitap bulunamadı.</p>
         </div>
       )}
     </div>
