@@ -63,7 +63,6 @@ const BookDetailPage = () => {
   const { handleInteraction, handleDragEnd, handleEdgeControl } = useBookEvents({
     currentPage,
     imageError,
-    animatePageChange,
     handlePageChange,
     controls,
     isClickableElement,

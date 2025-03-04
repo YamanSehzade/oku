@@ -85,7 +85,6 @@ export const useAnalytics = () => {
 
     // Sayfa değişikliğini takip et
     const updatePage = (newPage: number) => {
-      const timeSinceLastPage = Date.now() - lastPageChangeRef.current;
       currentPageRef.current = newPage;
       lastPageChangeRef.current = Date.now();
 

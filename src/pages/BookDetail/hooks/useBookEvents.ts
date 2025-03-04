@@ -5,7 +5,6 @@ import { SWIPE_CONF } from './useBookAnimation';
 interface UseBookEventsProps {
   currentPage: number;
   imageError: boolean;
-  animatePageChange: (direction: 'next' | 'prev' | 'direct', targetPage?: number) => Promise<void>;
   handlePageChange: (page: number) => Promise<void>;
   controls: any;
   isClickableElement: (target: HTMLElement) => boolean;
@@ -14,7 +13,6 @@ interface UseBookEventsProps {
 export const useBookEvents = ({
   currentPage,
   imageError,
-  animatePageChange,
   handlePageChange,
   controls,
   isClickableElement,
