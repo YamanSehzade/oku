@@ -3,6 +3,7 @@ import { logAnalyticsEvent } from '../config/firebase';
 export const AnalyticsEvents = {
   // Sayfa görüntüleme olayları
   PAGE_VIEW: 'page_view',
+  PAGE_TRANSITION: 'page_transition',
 
   // Kitap ile ilgili olaylar
   BOOK_VIEW: 'book_view',
@@ -11,16 +12,22 @@ export const AnalyticsEvents = {
   BOOK_FAVORITE: 'book_favorite',
   BOOK_UNFAVORITE: 'book_unfavorite',
   BOOK_PROGRESS_UPDATE: 'book_progress_update',
+  READING_SPEED: 'reading_speed',
+  READING_STATS: 'reading_stats',
+  PUBLISHER_STATS: 'publisher_stats',
 
   // Kullanıcı etkileşimleri
   SEARCH_PERFORM: 'search_perform',
   FILTER_APPLY: 'filter_apply',
   SHARE_CLICK: 'share_click',
+  USER_INTERACTION: 'user_interaction',
 
   // Uygulama olayları
   APP_INSTALL: 'app_install',
   APP_UPDATE: 'app_update',
   ERROR_OCCUR: 'error_occur',
+  SESSION_START: 'session_start',
+  SESSION_END: 'session_end',
 } as const;
 
 type EventParams = {
@@ -41,6 +48,7 @@ export const logBookView = (bookId: string, bookTitle: string, additionalParams?
   logAnalyticsEvent(AnalyticsEvents.BOOK_VIEW, {
     book_id: bookId,
     book_title: bookTitle,
+    timestamp: new Date().toISOString(),
     ...additionalParams,
   });
 };
@@ -114,5 +122,86 @@ export const logError = (
     error_code: errorCode,
     error_message: errorMessage,
     ...additionalParams,
+  });
+};
+
+// Publisher istatistikleri olayı
+export const logPublisherStats = (
+  publisher: string,
+  bookCount: number,
+  totalReadTime: number,
+  averageReadTime: number
+) => {
+  logAnalyticsEvent(AnalyticsEvents.PUBLISHER_STATS, {
+    publisher_name: publisher,
+    book_count: bookCount,
+    total_read_time_seconds: totalReadTime,
+    average_read_time_seconds: averageReadTime,
+    timestamp: new Date().toISOString(),
+  });
+};
+
+// Sayfa geçiş olayı
+export const logPageTransition = (fromPage: string, toPage: string, duration: number) => {
+  logAnalyticsEvent(AnalyticsEvents.PAGE_TRANSITION, {
+    from_page: fromPage,
+    to_page: toPage,
+    transition_duration_ms: duration,
+    timestamp: new Date().toISOString(),
+  });
+};
+
+// Okuma istatistikleri olayı
+export const logReadingStats = (
+  bookId: string,
+  totalPages: number,
+  completedPages: number,
+  averageTimePerPage: number
+) => {
+  logAnalyticsEvent(AnalyticsEvents.READING_STATS, {
+    book_id: bookId,
+    total_pages: totalPages,
+    completed_pages: completedPages,
+    average_time_per_page_ms: averageTimePerPage,
+    timestamp: new Date().toISOString(),
+  });
+};
+
+// Okuma hızı olayı
+export const logReadingSpeed = (bookId: string, pagesPerMinute: number) => {
+  logAnalyticsEvent(AnalyticsEvents.READING_SPEED, {
+    book_id: bookId,
+    pages_per_minute: pagesPerMinute,
+    timestamp: new Date().toISOString(),
+  });
+};
+
+// Kullanıcı etkileşim olayı
+export const logUserInteraction = (
+  interactionType: string,
+  targetElement: string,
+  additionalParams?: EventParams
+) => {
+  logAnalyticsEvent(AnalyticsEvents.USER_INTERACTION, {
+    interaction_type: interactionType,
+    target_element: targetElement,
+    timestamp: new Date().toISOString(),
+    ...additionalParams,
+  });
+};
+
+// Oturum başlangıç olayı
+export const logSessionStart = () => {
+  logAnalyticsEvent(AnalyticsEvents.SESSION_START, {
+    timestamp: new Date().toISOString(),
+    session_id: Math.random().toString(36).substring(7),
+  });
+};
+
+// Oturum bitiş olayı
+export const logSessionEnd = (sessionDuration: number) => {
+  logAnalyticsEvent(AnalyticsEvents.SESSION_END, {
+    session_duration_seconds: sessionDuration,
+    timestamp: new Date().toISOString(),
   });
 };

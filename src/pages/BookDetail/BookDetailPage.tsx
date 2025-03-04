@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { useLastRead } from '../../context/LastReadContext';
+import useAnalytics from '../../hooks/useAnalytics';
 import { BookImage } from './components/BookImage';
 import { BottomBar } from './components/BottomBar';
 import { EdgeControls } from './components/EdgeControls';
@@ -14,6 +15,7 @@ import { styles } from './styles';
 const BookDetailPage = () => {
   const { selectedBook, setSelectedBook } = useApp();
   const { getLastRead, saveLastRead } = useLastRead();
+  const analytics = useAnalytics();
 
   // Kitabın son okunan sayfasını al veya 1'den başla
   const [currentPage, setCurrentPage] = useState(() => {
@@ -108,6 +110,36 @@ const BookDetailPage = () => {
 
   // Buton sınıfları
   const buttonClassName = useMemo(() => styles.controls.button, []);
+
+  // Analytics hook'larını kullan
+  analytics.usePageView('book_detail');
+  analytics.useBookView(
+    selectedBook || {
+      name: '',
+      writer: null,
+      publisher: '',
+      series: null,
+      pageCount: 0,
+      link: '',
+    }
+  );
+  const { updatePage } = analytics.useBookReadingTime(
+    selectedBook || {
+      name: '',
+      writer: null,
+      publisher: '',
+      series: null,
+      pageCount: 0,
+      link: '',
+    }
+  );
+
+  // Sayfa değişikliğini takip et
+  useEffect(() => {
+    if (selectedBook) {
+      updatePage(currentPage);
+    }
+  }, [currentPage, updatePage, selectedBook]);
 
   if (!selectedBook) return null;
 
