@@ -5,7 +5,7 @@ import { SWIPE_CONF } from './useBookAnimation';
 interface UseBookEventsProps {
   currentPage: number;
   imageError: boolean;
-  animatePageChange: (direction: 'next' | 'prev') => Promise<void>;
+  animatePageChange: (direction: 'next' | 'prev' | 'direct', targetPage?: number) => Promise<void>;
   handlePageChange: (page: number) => Promise<void>;
   controls: any;
   isClickableElement: (target: HTMLElement) => boolean;
@@ -45,19 +45,19 @@ export const useBookEvents = ({
         const canGoPrev = currentPage > 1;
 
         if (info.velocity.x < -velocity && canGoNext) {
-          animatePageChange('next');
+          handlePageChange(currentPage + 1);
         } else if (info.velocity.x > velocity && canGoPrev) {
-          animatePageChange('prev');
+          handlePageChange(currentPage - 1);
         } else if (info.offset.x < -threshold && canGoNext) {
-          animatePageChange('next');
+          handlePageChange(currentPage + 1);
         } else if (info.offset.x > threshold && canGoPrev) {
-          animatePageChange('prev');
+          handlePageChange(currentPage - 1);
         } else {
           controls.start({ x: 0, transition: { duration: SWIPE_CONF.animationDuration } });
         }
       }
     },
-    [currentPage, imageError, handlePageChange, animatePageChange, controls, isClickableElement]
+    [currentPage, imageError, handlePageChange, controls, isClickableElement]
   );
 
   const handleDragEnd = useCallback(
@@ -73,7 +73,7 @@ export const useBookEvents = ({
         return;
       }
 
-      const threshold = window.innerWidth * 0.15; // Eşik değerini %15'e düşürdük
+      const threshold = window.innerWidth * 0.15;
       const canGoNext = !imageError;
       const canGoPrev = currentPage > 1;
 

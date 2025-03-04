@@ -1,5 +1,7 @@
+import { useEffect, useState } from 'react';
 import { BiChevronLeft, BiChevronRight } from 'react-icons/bi';
 import { Book } from '../../../types/book';
+import { PageMenu } from './PageMenu';
 
 interface BottomBarProps {
   book: Book;
@@ -18,6 +20,13 @@ export const BottomBar = ({
   imageError,
   onPageChange,
 }: BottomBarProps) => {
+  const [showPageMenu, setShowPageMenu] = useState(false);
+
+  useEffect(() => {
+    // controlsClassName değiştiğinde (yani bar gizlendiğinde) menüyü kapat
+    setShowPageMenu(false);
+  }, [controlsClassName]);
+
   return (
     <div
       className={`${controlsClassName} bottom-0 mx-2 mb-4 rounded-2xl bg-black/50 px-3 py-2 backdrop-blur-sm dark:bg-black/30 sm:mx-4 sm:px-4`}
@@ -31,17 +40,30 @@ export const BottomBar = ({
           <button
             onClick={() => onPageChange(currentPage - 1)}
             disabled={currentPage === 1}
-            className={`${buttonClassName} rounded-xl p-2`}
+            className={`${buttonClassName} touch-manipulation rounded-xl p-2`}
           >
             <BiChevronLeft className="h-6 w-6" />
           </button>
-          <span className="rounded-xl bg-white/10 px-4 py-2 text-xs font-medium backdrop-blur-sm dark:bg-white/5 sm:text-sm">
-            {currentPage} / {book.pageCount}
-          </span>
+          <div className="relative">
+            <button
+              onClick={() => setShowPageMenu(!showPageMenu)}
+              className="touch-manipulation rounded-xl bg-white/10 px-3 py-1.5 text-xs font-medium backdrop-blur-sm hover:bg-white/20 active:bg-white/30 dark:bg-white/5 dark:hover:bg-white/10 dark:active:bg-white/15 sm:px-4 sm:py-2 sm:text-sm"
+            >
+              {currentPage} / {book.pageCount}
+            </button>
+            {showPageMenu && (
+              <PageMenu
+                book={book}
+                currentPage={currentPage}
+                onPageChange={onPageChange}
+                onClose={() => setShowPageMenu(false)}
+              />
+            )}
+          </div>
           <button
             onClick={() => onPageChange(currentPage + 1)}
             disabled={imageError}
-            className={`${buttonClassName} rounded-xl p-2`}
+            className={`${buttonClassName} touch-manipulation rounded-xl p-2`}
           >
             <BiChevronRight className="h-6 w-6" />
           </button>

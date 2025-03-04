@@ -48,19 +48,16 @@ const BookDetailPage = () => {
     setCurrentPage,
     setImageError,
     scrollToTop,
+    currentPage,
   });
 
   const handlePageChange = useCallback(
     async (newPage: number) => {
-      if (newPage > 0) {
-        if (newPage > currentPage && !imageError) {
-          await animatePageChange('next');
-        } else if (newPage < currentPage) {
-          await animatePageChange('prev');
-        }
+      if (newPage > 0 && newPage <= (selectedBook?.pageCount || 0)) {
+        await animatePageChange('direct', newPage);
       }
     },
-    [currentPage, imageError, animatePageChange]
+    [animatePageChange, selectedBook?.pageCount]
   );
 
   const { handleInteraction, handleDragEnd, handleEdgeControl } = useBookEvents({
