@@ -135,7 +135,7 @@ const BookDetailPage = () => {
               imageError={imageError}
               currentImageUrl={currentImageUrl}
               onError={() => setImageError(true)}
-              onGoBack={() => {}}
+              onGoBack={() => setSelectedBook(null)}
             />
           </motion.div>
         </div>

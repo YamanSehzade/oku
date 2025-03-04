@@ -20,16 +20,35 @@ export const BookImage = ({
 }: BookImageProps) => {
   if (imageError) {
     return (
-      <div className={styles.error.container}>
-        <div className={styles.error.content}>
-          <div className="mb-4 text-2xl font-semibold text-white dark:text-yellow-400">
+      <div className="flex h-screen items-center justify-center bg-gradient-to-b from-gray-50 to-gray-100 p-4 dark:from-gray-900 dark:to-gray-800">
+        <div className="max-w-md rounded-2xl bg-white p-8 text-center shadow-xl dark:bg-white/10 dark:backdrop-blur-lg">
+          <div className="mb-6 inline-flex h-20 w-20 items-center justify-center rounded-full bg-primary-100 text-primary-600 dark:bg-yellow-500/20 dark:text-yellow-500">
+            <svg
+              className="h-10 w-10"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
+          </div>
+          <h3 className="mb-2 text-2xl font-bold text-gray-900 dark:text-yellow-400">
             Kitap Bitti
-          </div>
-          <div className="text-lg text-white/70 dark:text-yellow-400/60">
+          </h3>
+          <p className="mb-6 text-lg text-gray-600 dark:text-yellow-400/70">
             Bu kitabı okumayı tamamladınız
-          </div>
-          <button onClick={onGoBack} className={styles.error.button}>
-            Geri Dön
+          </p>
+          <button
+            onClick={onGoBack}
+            className="w-full rounded-xl bg-primary-600 px-6 py-3 text-sm font-medium text-white shadow-lg transition-all hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500/50 dark:bg-yellow-500 dark:text-gray-900 dark:hover:bg-yellow-400 dark:focus:ring-yellow-500/50"
+          >
+            Kütüphaneye Dön
           </button>
         </div>
       </div>
