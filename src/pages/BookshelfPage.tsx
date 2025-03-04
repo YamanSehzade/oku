@@ -72,29 +72,29 @@ const BookshelfPage = () => {
   return (
     <div className="space-y-6">
       {/* Sayfa Başlığı */}
-      <div className="rounded-lg border-l-2 border-primary-400 bg-white p-3 shadow-sm sm:p-4">
-        <h2 className="mb-2 flex items-center text-lg font-medium text-gray-800 sm:text-xl">
+      <div className="rounded-lg border-l-2 border-primary-400 bg-white p-3 shadow-sm dark:bg-gray-800 sm:p-4">
+        <h2 className="mb-2 flex items-center text-lg font-medium text-gray-800 dark:text-white sm:text-xl">
           <BiLibrary className="mr-2 h-5 w-5 text-primary-400 sm:h-6 sm:w-6" />
           Kitaplığım
         </h2>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-gray-500 dark:text-gray-400">
           Favori kitaplarınız ve son okuduğunuz kitaplar burada listelenir.
         </p>
       </div>
 
       {/* Son Okunan Kitaplar */}
       {recentlyReadBooks.length > 0 && (
-        <section className="overflow-hidden rounded-lg bg-white shadow-md">
+        <section className="overflow-hidden rounded-lg bg-white shadow-md dark:bg-gray-800">
           <button
             onClick={() => toggleSection('recent')}
-            className="flex w-full items-center justify-between p-6 hover:bg-gray-50"
+            className="flex w-full items-center justify-between p-6 hover:bg-gray-50 dark:hover:bg-gray-700"
           >
-            <h3 className="flex items-center text-lg font-semibold text-gray-900">
+            <h3 className="flex items-center text-lg font-semibold text-gray-900 dark:text-white">
               <BiHistory className="mr-2 h-5 w-5 text-primary-500" />
               Son Okunan Kitaplar
             </h3>
             <motion.div animate={{ rotate: isRecentOpen ? 180 : 0 }} transition={{ duration: 0.3 }}>
-              <BiChevronDown className="h-6 w-6 text-gray-500" />
+              <BiChevronDown className="h-6 w-6 text-gray-500 dark:text-gray-400" />
             </motion.div>
           </button>
           <AnimatePresence>
@@ -105,7 +105,7 @@ const BookshelfPage = () => {
                 exit={{ height: 0, opacity: 0 }}
                 transition={{ duration: 0.3 }}
               >
-                <div className="border-t border-gray-100 p-6">
+                <div className="border-t border-gray-100 p-6 dark:border-gray-700">
                   <div className="grid gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
                     {recentlyReadBooks.map((book, index) => (
                       <BookCard
@@ -125,12 +125,12 @@ const BookshelfPage = () => {
 
       {/* Favori Kitaplar */}
       {favorites.length > 0 && (
-        <section className="overflow-hidden rounded-lg bg-white shadow-md">
+        <section className="overflow-hidden rounded-lg bg-white shadow-md dark:bg-gray-800">
           <button
             onClick={() => toggleSection('favorites')}
-            className="flex w-full items-center justify-between p-6 hover:bg-gray-50"
+            className="flex w-full items-center justify-between p-6 hover:bg-gray-50 dark:hover:bg-gray-700"
           >
-            <h3 className="flex items-center text-lg font-semibold text-gray-900">
+            <h3 className="flex items-center text-lg font-semibold text-gray-900 dark:text-white">
               <BiHeart className="mr-2 h-5 w-5 text-primary-500" />
               Favori Kitaplar
             </h3>
@@ -138,7 +138,7 @@ const BookshelfPage = () => {
               animate={{ rotate: isFavoritesOpen ? 180 : 0 }}
               transition={{ duration: 0.3 }}
             >
-              <BiChevronDown className="h-6 w-6 text-gray-500" />
+              <BiChevronDown className="h-6 w-6 text-gray-500 dark:text-gray-400" />
             </motion.div>
           </button>
           <AnimatePresence>
@@ -149,7 +149,7 @@ const BookshelfPage = () => {
                 exit={{ height: 0, opacity: 0 }}
                 transition={{ duration: 0.3 }}
               >
-                <div className="border-t border-gray-100 p-6">
+                <div className="border-t border-gray-100 p-6 dark:border-gray-700">
                   <div className="grid gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
                     {favorites.map((book, index) => (
                       <BookCard key={book.link} book={book} index={index} />
@@ -164,12 +164,12 @@ const BookshelfPage = () => {
 
       {/* Biten Kitaplar */}
       {finishedBooks.length > 0 && (
-        <section className="overflow-hidden rounded-lg bg-white shadow-md">
+        <section className="overflow-hidden rounded-lg bg-white shadow-md dark:bg-gray-800">
           <button
             onClick={() => toggleSection('finished')}
-            className="flex w-full items-center justify-between p-6 hover:bg-gray-50"
+            className="flex w-full items-center justify-between p-6 hover:bg-gray-50 dark:hover:bg-gray-700"
           >
-            <h3 className="flex items-center text-lg font-semibold text-gray-900">
+            <h3 className="flex items-center text-lg font-semibold text-gray-900 dark:text-white">
               <BiBookmark className="mr-2 h-5 w-5 text-primary-500" />
               Biten Kitaplar
             </h3>
@@ -177,7 +177,7 @@ const BookshelfPage = () => {
               animate={{ rotate: isFinishedOpen ? 180 : 0 }}
               transition={{ duration: 0.3 }}
             >
-              <BiChevronDown className="h-6 w-6 text-gray-500" />
+              <BiChevronDown className="h-6 w-6 text-gray-500 dark:text-gray-400" />
             </motion.div>
           </button>
           <AnimatePresence>
@@ -188,7 +188,7 @@ const BookshelfPage = () => {
                 exit={{ height: 0, opacity: 0 }}
                 transition={{ duration: 0.3 }}
               >
-                <div className="border-t border-gray-100 p-6">
+                <div className="border-t border-gray-100 p-6 dark:border-gray-700">
                   <div className="grid gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
                     {finishedBooks.map((book, index) => (
                       <BookCard
@@ -208,10 +208,12 @@ const BookshelfPage = () => {
 
       {/* Boş Durum */}
       {recentlyReadBooks.length === 0 && favorites.length === 0 && finishedBooks.length === 0 && (
-        <div className="rounded-lg bg-white p-8 text-center text-gray-500 shadow-md">
-          <BiError className="mx-auto mb-4 h-12 w-12 text-gray-400" />
-          <p className="text-lg font-medium">Henüz kitaplığınızda kitap bulunmuyor.</p>
-          <p className="mt-2 text-gray-600">
+        <div className="rounded-lg bg-white p-8 text-center text-gray-500 shadow-md dark:bg-gray-800">
+          <BiError className="mx-auto mb-4 h-12 w-12 text-gray-400 dark:text-gray-500" />
+          <p className="text-lg font-medium dark:text-white">
+            Henüz kitaplığınızda kitap bulunmuyor.
+          </p>
+          <p className="mt-2 text-gray-600 dark:text-gray-400">
             Kitap okumaya başlayın veya favori kitaplarınızı ekleyin.
           </p>
         </div>
