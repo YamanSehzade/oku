@@ -18,16 +18,16 @@ type Props = {
 const Header = ({ activeTab, setActiveTab, isMenuOpen, setIsMenuOpen }: Props) => {
   const tabs = [
     {
-      id: 'kutuphane',
-      name: 'Kütüphane',
-      icon: BiBookOpen,
-      href: '/',
-    },
-    {
       id: 'kitaplik',
       name: 'Kitaplık',
       icon: BiLibrary,
-      href: '/kitaplik',
+      href: '/',
+    },
+    {
+      id: 'kutuphane',
+      name: 'Kütüphane',
+      icon: BiBookOpen,
+      href: '/kutuphane',
     },
     {
       id: 'hakkinda',

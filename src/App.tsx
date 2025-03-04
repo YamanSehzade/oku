@@ -21,22 +21,21 @@ interface BookDetailLayoutProps {
 }
 
 const DefaultLayout = ({
+  children,
   activeTab,
   setActiveTab,
   isMenuOpen,
   setIsMenuOpen,
 }: DefaultLayoutProps) => (
-  <>
+  <main className="min-h-screen bg-primary-50">
     <Header
       activeTab={activeTab}
       setActiveTab={setActiveTab}
       isMenuOpen={isMenuOpen}
       setIsMenuOpen={setIsMenuOpen}
     />
-    <main className="mx-auto max-w-7xl p-4 sm:px-6 lg:px-8">
-      <Outlet />
-    </main>
-  </>
+    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">{children || <Outlet />}</div>
+  </main>
 );
 
 const BookDetailLayout = ({ children }: BookDetailLayoutProps) => (
@@ -44,7 +43,16 @@ const BookDetailLayout = ({ children }: BookDetailLayoutProps) => (
 );
 
 const App = () => {
-  const [activeTab, setActiveTab] = useState('kitaplik');
+  // URL'e göre başlangıç tab'ini belirle
+  const getInitialTab = () => {
+    const path = window.location.pathname;
+    if (path === '/') return 'kitaplik';
+    if (path === '/kutuphane') return 'kutuphane';
+    if (path === '/hakkinda') return 'hakkinda';
+    return 'kitaplik';
+  };
+
+  const [activeTab, setActiveTab] = useState(getInitialTab());
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
@@ -64,10 +72,11 @@ const App = () => {
                   />
                 }
               >
-                <Route index element={<LibraryPage />} />
-                <Route path="kitaplik" element={<BookshelfPage />} />
+                <Route index element={<BookshelfPage />} />
+                <Route path="kutuphane" element={<LibraryPage />} />
                 <Route path="hakkinda" element={<AboutPage />} />
               </Route>
+
               <Route
                 path="/kitap/:id"
                 element={

@@ -9,7 +9,7 @@ interface TopBarProps {
 
 export const TopBar = ({ book, controlsClassName, onGoBack }: TopBarProps) => {
   const handlePrint = () => {
-    const currentImage = document.querySelector('.BookImage img') as HTMLImageElement;
+    const currentImage = document.querySelector('img[alt*="Sayfa"]') as HTMLImageElement;
     if (!currentImage) return;
 
     // iOS için basit bir çözüm
@@ -35,16 +35,29 @@ export const TopBar = ({ book, controlsClassName, onGoBack }: TopBarProps) => {
           <head>
             <title>${book.name}</title>
             <style>
+              @media print {
+                body {
+                  margin: 0;
+                  padding: 0;
+                }
+                img {
+                  width: 100%;
+                  height: auto;
+                  page-break-inside: avoid;
+                }
+              }
               body {
                 margin: 0;
                 display: flex;
                 justify-content: center;
-                align-items: center;
+                align-items: flex-start;
                 min-height: 100vh;
+                background: #000;
               }
               img {
                 max-width: 100%;
-                max-height: 100vh;
+                width: 100%;
+                height: auto;
                 object-fit: contain;
               }
             </style>
