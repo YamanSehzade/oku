@@ -15,6 +15,7 @@ const LibraryPage = () => {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+  const [isScrolled, setIsScrolled] = useState(false);
   const observer = useRef<IntersectionObserver>();
   const lastBookElementRef = useCallback(
     (node: HTMLDivElement) => {
@@ -33,6 +34,15 @@ const LibraryPage = () => {
     },
     [loading, hasMore]
   );
+
+  // Scroll listener
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Türkçe karakterleri İngilizce karakterlere dönüştür
   const turkishToEnglish = (text: string): string => {
@@ -117,17 +127,21 @@ const LibraryPage = () => {
       </div>
 
       {/* Arama Çubuğu */}
-      <div className="relative">
-        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-          <BiSearch className="h-5 w-5 text-gray-400" />
+      <div
+        className={`sticky top-0 z-50 bg-white/80 p-3 backdrop-blur-lg transition-all duration-300 ${isScrolled ? 'rounded-none shadow-md' : 'rounded-lg'}`}
+      >
+        <div className="relative transition-all duration-300 hover:scale-[1.01] hover:transform">
+          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
+            <BiSearch className="h-5 w-5 text-primary-500" />
+          </div>
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={e => setSearchTerm(e.target.value)}
+            placeholder="Kitap adı, yazar, yayınevi veya seri adı ile arayın..."
+            className={`block w-full rounded-xl border-2 border-gray-100 bg-white py-3.5 pl-11 pr-4 text-sm shadow-lg placeholder:text-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 sm:text-base`}
+          />
         </div>
-        <input
-          type="text"
-          value={searchTerm}
-          onChange={e => setSearchTerm(e.target.value)}
-          placeholder="Kitap adı, yazar, yayınevi veya seri adı ile arayın..."
-          className="block w-full rounded-lg border border-gray-200 bg-white py-3 pl-11 pr-4 text-sm placeholder:text-gray-400 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 sm:text-base"
-        />
       </div>
 
       {/* Sonuç Bilgisi */}
