@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { useLastRead } from '../../context/LastReadContext';
 import useAnalytics from '../../hooks/useAnalytics';
+import { useBookProgress } from '../../hooks/useBookProgress';
 import { BookImage } from './components/BookImage';
 import { BottomBar } from './components/BottomBar';
 import { EdgeControls } from './components/EdgeControls';
@@ -119,23 +120,26 @@ const BookDetailPage = () => {
       link: '',
     }
   );
-  const { updatePage } = analytics.useBookReadingTime(
-    selectedBook || {
+
+  // useBookProgress hook'unu kullan
+  const { updateProgress } = useBookProgress({
+    book: selectedBook || {
       name: '',
       writer: null,
       publisher: '',
       series: null,
       pageCount: 0,
       link: '',
-    }
-  );
+    },
+    currentPage,
+  });
 
   // Sayfa değişikliğini takip et
   useEffect(() => {
     if (selectedBook) {
-      updatePage(currentPage);
+      updateProgress(currentPage);
     }
-  }, [currentPage, updatePage, selectedBook]);
+  }, [currentPage, updateProgress, selectedBook]);
 
   if (!selectedBook) return null;
 
