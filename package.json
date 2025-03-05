@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@firebase/analytics": "^0.10.12",
+    "@headlessui/react": "^2.2.0",
     "@types/lodash": "^4.17.16",
     "@types/react-lazy-load-image-component": "^1.6.4",
     "@use-gesture/react": "^10.3.1",

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { BiBookOpen, BiError, BiFilterAlt, BiSearch } from 'react-icons/bi';
 import 'react-lazy-load-image-component/src/effects/blur.css';
 import BookCard from '../components/BookCard';
+import { Select } from '../components/Select';
 import { books } from '../utils/books';
 
 // Sayfa başına gösterilecek kitap sayısı
@@ -125,7 +126,7 @@ const LibraryPage = () => {
     <div className="space-y-4">
       {/* Sayfa Başlığı */}
       <div className="rounded-lg border border-gray-100 bg-white p-4 shadow-sm transition-all duration-200 hover:shadow dark:border-gray-700 dark:bg-gray-800">
-        <h2 className="mb-1.5 flex items-center text-lg font-medium text-gray-800 sm:text-xl dark:text-white">
+        <h2 className="mb-1.5 flex items-center text-lg font-medium text-gray-800 dark:text-white sm:text-xl">
           <BiBookOpen className="mr-2 h-5 w-5 text-primary-500 sm:h-6 sm:w-6" />
           Kütüphane
         </h2>
@@ -158,33 +159,13 @@ const LibraryPage = () => {
 
           {/* Yayınevi Filtresi */}
           <div className="relative flex w-full sm:w-auto">
-            <select
+            <Select
               value={selectedPublisher}
-              onChange={e => setSelectedPublisher(e.target.value)}
-              className="w-full appearance-none rounded-lg border border-gray-200 bg-gray-50 px-3.5 py-3 pr-10 text-[15px] text-gray-900 shadow-sm transition-all duration-200 focus:border-primary-500 focus:bg-white focus:shadow-md focus:outline-none focus:ring-1 focus:ring-primary-500/30 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:border-primary-400 dark:focus:bg-gray-800"
-            >
-              <option value="">Tüm Yayınevleri</option>
-              {publishers.map(publisher => (
-                <option key={publisher} value={publisher} className="py-2">
-                  {publisher}
-                </option>
-              ))}
-            </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-              <svg
-                className="h-4 w-4 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M19 9l-7 7-7-7"
-                />
-              </svg>
-            </div>
+              onChange={setSelectedPublisher}
+              options={publishers}
+              placeholder="Tüm Yayınevleri"
+              className="w-full sm:w-[200px]"
+            />
           </div>
         </div>
       </div>
