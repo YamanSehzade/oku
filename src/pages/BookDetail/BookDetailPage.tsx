@@ -54,7 +54,7 @@ const BookDetailPage = () => {
 
   const handlePageChange = useCallback(
     async (newPage: number) => {
-      if (newPage > 0 && newPage <= (selectedBook?.pageCount || 0)) {
+      if (newPage > 0 && newPage <= (selectedBook?.pageCount || 0) + 1) {
         await animatePageChange('direct', newPage);
       }
     },
